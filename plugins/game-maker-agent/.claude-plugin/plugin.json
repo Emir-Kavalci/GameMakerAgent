@@ -1,7 +1,7 @@
 {
   "name": "game-maker-agent",
   "displayName": "GameMakerAgent",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "A solo game-dev team for Unreal Engine: game designer, programmer, QA and producer agents, plus project setup and feature workflow skills",
   "author": {
     "name": "Emir Kavalci",

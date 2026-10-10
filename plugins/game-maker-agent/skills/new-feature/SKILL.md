@@ -27,11 +27,13 @@ Show the user the spec's goal and acceptance criteria.
 
 ## Step 2: Code (programmer)
 
-Ask the `game-maker-agent:programmer` agent to implement the approved spec, naming the spec file, and to report which files it changed and how to build.
+Ask the `game-maker-agent:programmer` agent to implement the approved spec, naming the spec file, and to report which files it changed. Tell it not to build yet; the build happens at the checkpoint below.
 
-**Checkpoint:** ask the user to build the project (Live Coding with Ctrl+Alt+F11 in the editor, or from Visual Studio) and tell you the result.
-- If the build fails, send the error text to the `game-maker-agent:programmer` agent to fix, then ask the user to build again.
-- Continue when the build succeeds.
+**Checkpoint (build):** don't send the user to Visual Studio; beginners get lost there.
+1. Ask the user to close the Unreal Editor if it is open (File > Save All first), and to say when it is closed.
+2. Run the build yourself with the command from the project's `CLAUDE.md` (Build section). If it has none, find it the way the programmer agent's instructions describe: `"<EngineDir>/Engine/Build/BatchFiles/Build.bat" <ProjectName>Editor Win64 Development -Project="<full path to .uproject>" -WaitMutex`. Tell the user it can take a few minutes.
+3. If the build fails, send the first error to the `game-maker-agent:programmer` agent to fix, then build again. After three failed attempts, stop and explain the situation to the user.
+4. Continue when the output says `Result: Succeeded`.
 
 ## Step 3: Review (qa)
 
@@ -40,7 +42,7 @@ Ask the `game-maker-agent:qa` agent to review the change against the spec's acce
 - If the verdict is "Needs fixes", show the problems, and with the user's agreement send the Blocker and Major problems to the `game-maker-agent:programmer` agent. Then repeat the build checkpoint and Step 3. Stop after two fix rounds and let the user decide how to continue.
 - If the verdict is "Ready to test in editor", show the manual test plan.
 
-**Checkpoint:** ask the user to follow the test plan in the editor and report what happened. Problems they find go back to the programmer, like QA problems.
+**Checkpoint (editor test):** tell the user to open the project in the Unreal Editor now (double-click the `.uproject` file), follow the test plan, and report what happened. Remind them to use File > Save All before closing the editor. Problems they find go back to the programmer, like QA problems.
 
 ## Step 4: Wrap up (producer)
 

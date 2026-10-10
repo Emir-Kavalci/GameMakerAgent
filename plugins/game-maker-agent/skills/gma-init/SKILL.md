@@ -62,8 +62,12 @@ Templates for this skill are in `${CLAUDE_SKILL_DIR}/templates/`.
    - Never delete Binaries/, Intermediate/, Saved/ or DerivedDataCache/ without asking.
 
    ## Build
-   - Build from the editor with Live Coding (Ctrl+Alt+F11) or from Visual Studio.
+   Close the Unreal Editor first, then run:
+   "<EngineDir>/Engine/Build/BatchFiles/Build.bat" <ProjectName>Editor Win64 Development -Project="<full path to .uproject>" -WaitMutex
+   Success ends with "Result: Succeeded". Live Coding (Ctrl+Alt+F11 in the editor) only works for small changes inside existing .cpp files.
    ```
+
+   To fill in `<EngineDir>`, find the engine for the `EngineAssociation` version: check that `C:/Program Files/Epic Games/UE_<version>/Engine/Build/BatchFiles/Build.bat` exists; if not, read the registry value `InstalledDirectory` under `HKLM\SOFTWARE\EpicGames\Unreal Engine\<version>`; if that fails too, ask the user where Unreal Engine is installed. Use forward slashes in paths. Don't run the build during setup.
 
    For a Blueprint-only project, write "Project type: Blueprint-only", drop the module line, and add: "To add C++ later, use Tools > New C++ Class in the editor."
 

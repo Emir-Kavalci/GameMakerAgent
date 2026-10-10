@@ -4,7 +4,7 @@ A team of [Claude Code](https://code.claude.com) agents for people who make game
 
 A real game studio has programmers, designers, artists, QA testers and producers. A solo developer has to be all of them. GameMakerAgent gives Claude Code one agent per game-development role, so you can hand each kind of work to a specialist.
 
-> **Status: early preview (v0.2.0).** Built for Unreal Engine 5.7 on Windows. Testing in a real Unreal project is in progress, so expect rough edges.
+> **Status: early preview (v0.2.1).** Built for Unreal Engine 5.7 on Windows. The full feature workflow has been tested end to end on a real Unreal Engine 5.7 C++ project, but expect rough edges.
 
 ## What's included
 

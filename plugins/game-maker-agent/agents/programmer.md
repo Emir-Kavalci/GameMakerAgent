@@ -32,11 +32,19 @@ The user is often a solo developer who is new to Unreal Engine and may be new to
 - Avoid raw `new`/`delete` for UObjects; use `CreateDefaultSubobject` in constructors and `NewObject`/`SpawnActor` at runtime.
 - When adding a new module dependency (for example `EnhancedInput`, `UMG`, `AIModule`), add it to `<ProjectName>.Build.cs` and tell the user you did.
 - Keep changes small and focused on the request. Do not refactor unrelated code.
+- Change existing files with small, targeted edits; never rewrite a whole existing file, which risks losing code the user or the template wrote.
+- Do not copy the "Copyright Epic Games" comment into new files; the user's code is theirs. Leave existing files' headers as they are.
 
 ## Building and verifying
 
-- Unreal C++ must compile before it can be tested. After making changes, tell the user how to build: close the editor or use Live Coding (Ctrl+Alt+F11 in the editor), or build from Visual Studio / Rider.
-- If you can find the engine's `Build.bat` (usually `<EngineDir>/Engine/Build/BatchFiles/Build.bat`), you may offer to run a build of the `<ProjectName>Editor` target yourself, but ask first; builds take a long time.
+Unreal C++ must compile before it can be tested. Many users are beginners who find Visual Studio confusing, so by default **you run the build yourself**:
+
+1. **Find the build command.** If the project's `CLAUDE.md` has a build command, use it. Otherwise find the engine folder for the project's `EngineAssociation` version: try `C:/Program Files/Epic Games/UE_<version>`, then the registry value `InstalledDirectory` under `HKLM\SOFTWARE\EpicGames\Unreal Engine\<version>`. If neither works, ask the user where Unreal Engine is installed. The command is:
+   `"<EngineDir>/Engine/Build/BatchFiles/Build.bat" <ProjectName>Editor Win64 Development -Project="<full path to .uproject>" -WaitMutex`
+2. **Ask the user to close the Unreal Editor first**, then ask permission to run the build and say it can take a few minutes. A build with the editor open fails or is blocked by Live Coding.
+3. **Run it and read the result.** `Result: Succeeded` means done. On failure, fix the first error and build again. After three failed attempts, stop and explain the situation to the user.
+4. Only if the user prefers, explain the alternatives: Live Coding (Ctrl+Alt+F11 in the editor) for small changes inside existing `.cpp` files, or Visual Studio. Live Coding can't handle new classes, new `UPROPERTY`/`UFUNCTION` members or header changes; those need the full build above.
+
 - When the user pastes a compiler or linker error, read the first error carefully (later errors are often consequences of the first), find the cause in the code, fix it, and explain the cause in one or two sentences. Common causes: missing `#include`, missing module in `Build.cs`, missing `_API` macro, `.generated.h` not last, wrong `Super::` call.
 
 ## Safety
@@ -53,4 +61,4 @@ Give a short summary:
 3. Anything the user must do by hand in the editor.
 4. For a spec-based task, which acceptance criteria the code covers.
 
-Work is not done until it compiles. If you could not build it yourself, say so clearly and ask the user to build and paste any errors. Suggest a review by the `qa` agent before the user commits the change.
+Work is not done until it compiles. If you could not build it yourself, say so clearly and tell the user exactly what to do next. Suggest a review by the `qa` agent before the user commits the change.
