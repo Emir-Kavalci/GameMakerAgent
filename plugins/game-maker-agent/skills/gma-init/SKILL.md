@@ -53,6 +53,7 @@ Templates for this skill are in `${CLAUDE_SKILL_DIR}/templates/`.
    - programmer builds it; work is done only when it compiles.
    - qa reviews the change against the spec's acceptance criteria.
    - producer keeps Docs/Tasks.md up to date.
+   - art-director (Docs/ArtBible.md, Docs/AssetList.md), technical-artist (naming, budgets, materials), audio-director (Docs/AudioList.md) and marketing (Docs/Marketing/) plan art, sound and promotion.
 
    ## Conventions
    - Follow Unreal Engine naming conventions (A/U/F/E/I prefixes, b for booleans).

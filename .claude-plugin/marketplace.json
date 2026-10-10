@@ -8,7 +8,7 @@
     {
       "name": "game-maker-agent",
       "source": "./plugins/game-maker-agent",
-      "description": "A solo game-dev team for Unreal Engine: game designer, programmer, QA and producer agents"
+      "description": "A solo game-dev team for Unreal Engine: eight role agents from game design to marketing"
     }
   ]
 }

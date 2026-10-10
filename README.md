@@ -4,11 +4,13 @@ A team of [Claude Code](https://code.claude.com) agents for people who make game
 
 A real game studio has programmers, designers, artists, QA testers and producers. A solo developer has to be all of them. GameMakerAgent gives Claude Code one agent per game-development role, so you can hand each kind of work to a specialist.
 
-> **Status: early preview (v0.2.1).** Built for Unreal Engine 5.7 on Windows. The full feature workflow has been tested end to end on a real Unreal Engine 5.7 C++ project, but expect rough edges.
+> **Status: early preview (v0.3.0).** Built for Unreal Engine 5.7 on Windows. The core feature workflow (designer, programmer, QA, producer) has been tested end to end on a real Unreal Engine 5.7 C++ project. The art, audio and marketing agents are new and less tested. Expect rough edges.
 
 ## What's included
 
 ### Agents
+
+**Core team: builds the game**
 
 | Agent | Role |
 | --- | --- |
@@ -19,6 +21,17 @@ A real game studio has programmers, designers, artists, QA testers and producers
 
 The agent that writes code is never the one that reviews it.
 
+**Production and launch: plans art, sound and promotion**
+
+| Agent | Role |
+| --- | --- |
+| `art-director` | Defines the visual style (`Docs/ArtBible.md`), lists every art asset (`Docs/AssetList.md`), writes briefs and prompts for artists or image tools, and reviews your screenshots. |
+| `technical-artist` | Naming rules, folder structure, polygon and texture budgets, import and material setup, Content folder audits, and Unreal Editor Python / Blender scripts. |
+| `audio-director` | Plans sound effects and music (`Docs/AudioList.md`), writes briefs and prompts for audio, and explains how to set sounds up in Unreal. |
+| `marketing` | Store page text, trailer shot list, devlogs, press kit and launch plan in `Docs/Marketing/`. Only claims what is really in your game, and never publishes anything itself. |
+
+**What these agents can't do:** Claude doesn't create images, 3D models, music or sound files. These agents plan, describe, write briefs and prompts for the people or tools you choose, write scripts, and review results.
+
 ### Skills (slash commands)
 
 | Command | What it does |
@@ -26,7 +39,7 @@ The agent that writes code is never the one that reviews it.
 | `/game-maker-agent:gma-init` | Run once inside your Unreal project. Creates `CLAUDE.md`, `Docs/GDD.md`, `Docs/Tasks.md`, and (if you agree) Unreal-ready `.gitignore` and `.gitattributes` files. |
 | `/game-maker-agent:new-feature <idea>` | Takes one feature from idea to reviewed code: spec → code → your build → QA review → your editor test → task list update. You approve every step. |
 
-Planned roles: Art Director, Technical Artist, Audio and Marketing.
+Planned: engine integrations (MCP), more workflows, and later other engines (Unity, Godot).
 
 ## Install
 
