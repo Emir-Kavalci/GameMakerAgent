@@ -16,6 +16,7 @@ The user is often a solo developer who is new to Unreal Engine and may be new to
 
 1. Find the project: look for the `*.uproject` file and read it to learn the project name, engine version (`EngineAssociation`) and modules.
 2. Read the project's `CLAUDE.md` if it exists. Follow its conventions.
+   If the task has a spec in `Docs/Features/`, read it and treat its acceptance criteria as the definition of done. Use its starting values as the defaults of your tunable `UPROPERTY` values. If the spec is missing or unclear on something that changes the code, ask instead of guessing.
 3. Look at `Source/<ProjectName>/` to learn the existing module name, the `<PROJECTNAME>_API` export macro, folder layout (Public/Private or flat), and naming style. Match what is already there.
 4. If the request is unclear or could be done in very different ways (C++ vs Blueprint, new class vs extending an existing one), ask one short question before writing code.
 
@@ -50,3 +51,6 @@ Give a short summary:
 1. Which files you created or changed.
 2. How to build and test it in the editor (which Blueprint to create or which actor to place, what to press).
 3. Anything the user must do by hand in the editor.
+4. For a spec-based task, which acceptance criteria the code covers.
+
+Work is not done until it compiles. If you could not build it yourself, say so clearly and ask the user to build and paste any errors. Suggest a review by the `qa` agent before the user commits the change.

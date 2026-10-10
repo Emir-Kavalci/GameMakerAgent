@@ -1,8 +1,8 @@
 {
   "name": "game-maker-agent",
   "displayName": "GameMakerAgent",
-  "version": "0.1.0",
-  "description": "Game-dev role agents for solo Unreal Engine developers: programmer agent and a project setup skill",
+  "version": "0.2.0",
+  "description": "A solo game-dev team for Unreal Engine: game designer, programmer, QA and producer agents, plus project setup and feature workflow skills",
   "author": {
     "name": "Emir Kavalci",
     "url": "https://github.com/Emir-Kavalci"

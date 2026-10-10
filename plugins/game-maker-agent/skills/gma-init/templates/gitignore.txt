@@ -1,0 +1,22 @@
+# Unreal Engine build output and caches (regenerated automatically)
+Binaries/
+DerivedDataCache/
+Intermediate/
+Saved/
+Plugins/**/Binaries/
+Plugins/**/Intermediate/
+
+# IDE files (regenerated from the .uproject)
+.vs/
+.idea/
+*.sln
+*.suo
+*.opensdf
+*.sdf
+*.VC.db
+*.VC.opendb
+
+# OS noise
+Thumbs.db
+desktop.ini
+.DS_Store
