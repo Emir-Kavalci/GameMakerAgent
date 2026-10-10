@@ -1,0 +1,14 @@
+{
+  "name": "game-maker-agent",
+  "description": "Claude Code agents for solo Unreal Engine game developers",
+  "owner": {
+    "name": "Emir Kavalci"
+  },
+  "plugins": [
+    {
+      "name": "game-maker-agent",
+      "source": "./plugins/game-maker-agent",
+      "description": "A team of game-dev role agents (starting with an Unreal Engine C++ programmer) for solo developers"
+    }
+  ]
+}
