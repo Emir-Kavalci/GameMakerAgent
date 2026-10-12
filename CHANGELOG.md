@@ -4,6 +4,23 @@ All notable changes to GameMakerAgent are listed here. Versions follow [Semantic
 
 To update an installed copy, run `/plugin marketplace update game-maker-agent` in Claude Code, then `/plugin update game-maker-agent@game-maker-agent`, and restart Claude Code.
 
+## [0.5.0] - 2026-10-12
+
+### Added
+- Unreal Editor connection (Windows): an MCP server that runs on the Python inside Unreal Engine and talks to the open editor through Epic's remote execution, with nothing extra to install. Tools: `unreal_status`, `unreal_list_assets`, `unreal_list_level_actors`, `unreal_get_properties` (read-only) and `unreal_run_python` (asks before every script).
+- `gma-init` offers to turn the connection on (Python Editor Script Plugin and "Enable Remote Execution").
+- `programmer` and `technical-artist` can change Blueprint values, assets and the level through the editor; `qa` and `game-designer` can read the real values.
+- Free tests for the bridge, run on every push.
+
+### Changed
+- The safety guard always asks before a Python script runs in the editor, in every folder.
+- `technical-artist` audits use real asset types from the editor when it's connected.
+- `marketing` no longer writes a feature into store texts just because the user asked, when the design documents say the game doesn't have it (found by the eval suite).
+- `gma-init` still writes `CLAUDE.md` when it can't find the engine folder, and asks for the path at the end.
+
+### Fixed
+- `technical-artist` wrongly said the Python Editor Script Plugin is on by default; in UE 5.7 it is off.
+
 ## [0.4.0] - 2026-10-12
 
 ### Added
@@ -40,6 +57,7 @@ To update an installed copy, run `/plugin marketplace update game-maker-agent` i
 ### Added
 - First release: plugin marketplace, `programmer` agent and `/game-maker-agent:gma-init`.
 
+[0.5.0]: https://github.com/Emir-Kavalci/GameMakerAgent/releases/tag/game-maker-agent--v0.5.0
 [0.4.0]: https://github.com/Emir-Kavalci/GameMakerAgent/releases/tag/game-maker-agent--v0.4.0
 [0.3.0]: https://github.com/Emir-Kavalci/GameMakerAgent/releases/tag/game-maker-agent--v0.3.0
 [0.2.1]: https://github.com/Emir-Kavalci/GameMakerAgent/releases/tag/game-maker-agent--v0.2.1

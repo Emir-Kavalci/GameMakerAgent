@@ -48,6 +48,9 @@ check "git status is allowed"             "$unreal" none "$(shell Bash 'git stat
 check "word 'model' is not 'del'"         "$unreal" none "$(shell Bash 'grep -r model Source')"
 check "outside Unreal: .uasset ignored"   "$other"  none "$(edit Edit 'Content/BP_Gem.uasset')"
 check "outside Unreal: rm ignored"        "$other"  none "$(shell Bash 'rm -rf build')"
+check "editor Python asks"                "$unreal" ask  '{"hook_event_name":"PreToolUse","tool_name":"mcp__plugin_game-maker-agent_unreal__unreal_run_python","tool_input":{"code":"print(1)"}}'
+check "outside Unreal: editor Python asks" "$other" ask  '{"hook_event_name":"PreToolUse","tool_name":"mcp__plugin_game-maker-agent_unreal__unreal_run_python","tool_input":{"code":"print(1)"}}'
+check "editor read-only tool is allowed"  "$unreal" none '{"hook_event_name":"PreToolUse","tool_name":"mcp__plugin_game-maker-agent_unreal__unreal_list_assets","tool_input":{}}'
 
 if [ "$fail" -ne 0 ]; then
   echo "Some guard tests failed."

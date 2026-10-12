@@ -1,6 +1,6 @@
 ---
 name: gma-init
-description: Set up an Unreal Engine project for GameMakerAgent. Creates CLAUDE.md, a Game Design Document, a task list, and Unreal-ready .gitignore and .gitattributes files. Run this once in the root folder of an Unreal project.
+description: Set up an Unreal Engine project for GameMakerAgent. Creates CLAUDE.md, a Game Design Document, a task list, Unreal-ready .gitignore and .gitattributes files, and optionally turns on the Unreal Editor connection. Run this once in the root folder of an Unreal project.
 disable-model-invocation: true
 argument-hint: "[short description of your game]"
 allowed-tools: Read(${CLAUDE_SKILL_DIR}/templates/**)
@@ -15,7 +15,7 @@ Templates for this skill are in `${CLAUDE_SKILL_DIR}/templates/`.
 ## Rules for every file
 
 - Never overwrite an existing file silently. If a file already exists, show the user what you would add or change and ask first.
-- Create files only in the project root and its `Docs/` folder.
+- Create files only in the project root and its `Docs/` folder. The only other file you may change is `Config/DefaultEngine.ini` (step 7).
 - At the end, list every file you created or changed.
 
 ## Steps
@@ -68,7 +68,7 @@ Templates for this skill are in `${CLAUDE_SKILL_DIR}/templates/`.
    Success ends with "Result: Succeeded". Live Coding (Ctrl+Alt+F11 in the editor) only works for small changes inside existing .cpp files.
    ```
 
-   To fill in `<EngineDir>`, find the engine for the `EngineAssociation` version: check that `C:/Program Files/Epic Games/UE_<version>/Engine/Build/BatchFiles/Build.bat` exists; if not, read the registry value `InstalledDirectory` under `HKLM\SOFTWARE\EpicGames\Unreal Engine\<version>`; if that fails too, ask the user where Unreal Engine is installed. Use forward slashes in paths. Don't run the build during setup.
+   To fill in `<EngineDir>`, find the engine for the `EngineAssociation` version: check that `C:/Program Files/Epic Games/UE_<version>/Engine/Build/BatchFiles/Build.bat` exists; if not, read the registry value `InstalledDirectory` under `HKLM\SOFTWARE\EpicGames\Unreal Engine\<version>`; if that fails too, still write `CLAUDE.md` with `<EngineDir>` left as a placeholder, finish the other steps, and at the end ask the user where Unreal Engine is installed so you can fill it in. Use forward slashes in paths. Don't run the build during setup.
 
    For a Blueprint-only project, write "Project type: Blueprint-only", drop the module line, and add: "To add C++ later, use Tools > New C++ Class in the editor."
 
@@ -82,7 +82,18 @@ Templates for this skill are in `${CLAUDE_SKILL_DIR}/templates/`.
    - `.gitattributes` stores Unreal's large binary files with Git LFS. Check `git lfs version`. If Git LFS is missing, tell the user to install it from https://git-lfs.com and then run `git lfs install` once; do not install it yourself.
    - If the folder is not a git repository, still offer the files, and mention that the user can turn the folder into a repository later.
 
-7. **Finish** with a short summary: the files you created, and three example requests the user can try next:
+7. **Editor connection (optional, Windows).** Explain in two sentences: GameMakerAgent can connect to the open Unreal Editor, so agents can read Blueprint values, list assets and level actors, and (only after the user approves each script) change things the safe way through the editor. It stays on this computer. Ask whether to turn it on. If yes:
+   - Ask the user to close the Unreal Editor first and wait until they say it is closed.
+   - In the `.uproject` file, add `{ "Name": "PythonScriptPlugin", "Enabled": true, "TargetAllowList": [ "Editor" ] }` to the `Plugins` list, unless it is already there. Keep the file's existing formatting (tabs).
+   - In `Config/DefaultEngine.ini`, add this section at the end, unless `bRemoteExecution` is already set:
+     ```
+     [/Script/PythonScriptPlugin.PythonScriptPluginSettings]
+     bRemoteExecution=True
+     ```
+   - Tell the user to open the editor again, and that they can check the connection any time by asking "Is the Unreal Editor connected?".
+   For a project that is not on Windows, skip this step and say the connection is Windows-only for now.
+
+8. **Finish** with a short summary: the files you created, and three example requests the user can try next:
    - "Use the game-designer agent to design a sprint ability."
    - "/game-maker-agent:new-feature sprint ability"
    - "Use the producer agent to plan my first playable milestone."

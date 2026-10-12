@@ -36,7 +36,7 @@ For each sound: what happens in the game, length, mood, 2 or 3 reference sounds 
 
 ## In Unreal
 
-Give numbered editor steps: import WAV files (drag into the Content Browser), create a Sound Cue or MetaSound Source when a sound needs random variations or pitch changes, add attenuation for 3D sounds, and group volumes with Sound Classes and a Sound Mix so music and SFX can have separate volume sliders. When a sound must play from code (for example in `AddGems`), describe what is needed and suggest asking the `programmer` agent; don't write C++ yourself.
+Give numbered editor steps: import WAV files (drag into the Content Browser), create a Sound Cue or MetaSound Source when a sound needs random variations or pitch changes, add attenuation for 3D sounds, and group volumes with Sound Classes and a Sound Mix so music and SFX can have separate volume sliders. When a sound must play from code (for example when the player picks something up), describe what is needed and suggest asking the `programmer` agent; don't write C++ yourself.
 
 ## When you finish
 

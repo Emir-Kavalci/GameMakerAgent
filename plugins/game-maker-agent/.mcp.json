@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "unreal": {
+      "command": "cmd",
+      "args": ["/d", "/c", "${CLAUDE_PLUGIN_ROOT}\\mcp\\start.cmd"]
+    }
+  }
+}

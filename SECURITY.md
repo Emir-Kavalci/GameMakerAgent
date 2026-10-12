@@ -1,6 +1,6 @@
 # Security
 
-GameMakerAgent runs inside Claude Code on your computer. Its agents can read and write files in your project, and its safety guard hook runs before file edits and shell commands.
+GameMakerAgent runs inside Claude Code on your computer. Its agents can read and write files in your project, and its safety guard hook runs before file edits and shell commands. The optional Unreal Editor connection runs Python scripts inside your open editor through Epic's remote execution, which only accepts connections from this computer (127.0.0.1); every script that can change the project needs your approval.
 
 ## Reporting a problem
 

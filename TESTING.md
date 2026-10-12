@@ -6,6 +6,8 @@ GameMakerAgent has three kinds of checks. Run them before you publish a change t
 | --- | --- | --- | --- |
 | `claude plugin validate` | Manifests and the agent, skill and hook files are well-formed | Free | Yes, on every push |
 | `tests/test-guard.sh` | The safety hook blocks and allows the right tool calls | Free | Yes, on every push |
+| `tests/test_bridge.py` | The Unreal Editor bridge speaks MCP correctly (no editor needed) | Free | Yes, on every push |
+| Bridge with a live editor | The bridge reads and changes a real open project | Free | No, run it yourself (see below) |
 | Eval suite (`claude plugin eval`) | Each agent and skill behaves the way its instructions say | Uses the Claude plan of whoever runs it | No, run it yourself |
 
 GameMakerAgent itself is free. People who install the plugin never run these tests and are never charged for them. The eval suite only runs when a developer of this repository starts it by hand, and then it counts against that developer's own Claude plan. Nothing runs it automatically.
@@ -18,7 +20,19 @@ From the repository root (on Windows, use Git Bash):
 claude plugin validate .
 claude plugin validate plugins/game-maker-agent
 bash tests/test-guard.sh
+python tests/test_bridge.py
 ```
+
+## Unreal Editor bridge with a live editor
+
+The bridge (`plugins/game-maker-agent/mcp/`) can only be fully tested against a real editor, so this is a manual check on Windows:
+
+1. Open an Unreal 5.7 test project whose editor connection is on (see the README).
+2. In a terminal in that project folder, start Claude Code with your working copy: `claude --plugin-dir <repo>/plugins/game-maker-agent`.
+3. Ask: "Is the Unreal Editor connected?", then "List the Blueprints in my project", "What are the default values of <a Blueprint>?" and "List the actors in the open level".
+4. Ask for a small change (for example "set <Blueprint>'s <value> to 2"). Claude Code must show you the script and wait for your OK before it runs. Afterwards ask Claude to set it back, or close the editor without saving.
+
+The eval suite can't cover the bridge, because eval runs have no editor.
 
 ## Eval suite
 

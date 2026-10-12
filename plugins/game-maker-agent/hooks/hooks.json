@@ -1,9 +1,9 @@
 {
-  "description": "GameMakerAgent safety guard for Unreal projects: blocks edits to binary assets and the engine folder, and asks before deleting files",
+  "description": "GameMakerAgent safety guard for Unreal projects: blocks edits to binary assets and the engine folder, asks before deleting files, and asks before running Python in the Unreal Editor",
   "hooks": {
     "PreToolUse": [
       {
-        "matcher": "Write|Edit|MultiEdit|NotebookEdit|Bash|PowerShell",
+        "matcher": "Write|Edit|MultiEdit|NotebookEdit|Bash|PowerShell|mcp__plugin_game-maker-agent_unreal__unreal_run_python",
         "hooks": [
           {
             "type": "command",

@@ -19,8 +19,9 @@ plugins/game-maker-agent/
   agents/<role>.md                  one file per agent: frontmatter + instructions
   skills/<name>/SKILL.md            slash commands (gma-init, new-feature)
   hooks/                            the safety guard
+  mcp/                              the Unreal Editor bridge (MCP server)
   evals/                            behavior tests (see TESTING.md)
-tests/test-guard.sh                 tests for the safety guard
+tests/                              free tests for the safety guard and the bridge
 ```
 
 ## Making a change
@@ -36,6 +37,7 @@ tests/test-guard.sh                 tests for the safety guard
    claude plugin validate .
    claude plugin validate plugins/game-maker-agent
    bash tests/test-guard.sh
+   python tests/test_bridge.py
    ```
 5. If you changed an agent or skill, run its eval case if you can. This uses your own Claude plan, so it's optional; say in the pull request whether you ran it.
 6. Open a pull request and fill in the template.

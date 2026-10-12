@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   validate:
-    name: Validate plugin and test safety hook
+    name: Validate plugin and run free tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -30,3 +30,6 @@ jobs:
 
       - name: Test safety hook
         run: bash tests/test-guard.sh
+
+      - name: Test Unreal bridge (no editor needed)
+        run: python3 tests/test_bridge.py

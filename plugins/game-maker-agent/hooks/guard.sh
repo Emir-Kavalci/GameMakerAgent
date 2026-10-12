@@ -1,17 +1,14 @@
 #!/usr/bin/env bash
 # GameMakerAgent safety guard (PreToolUse hook).
-# Only acts inside an Unreal project (a folder with a .uproject file):
+# Everywhere:
+# - asks the user before every Python script sent to the Unreal Editor
+# Only inside an Unreal project (a folder with a .uproject file):
 # - denies Write/Edit on .uasset/.umap files (binary assets; use the editor)
 # - denies Write/Edit inside an Unreal Engine installation
 # - asks the user before shell commands that delete or discard files
 # Reads the hook input JSON on stdin. Uses only grep, so it needs no jq.
 
 input=$(tr -d '\r\n')
-
-project_dir="${CLAUDE_PROJECT_DIR:-$PWD}"
-if ! ls "$project_dir"/*.uproject >/dev/null 2>&1; then
-  exit 0
-fi
 
 # A JSON string literal: quotes around any mix of non-quote/non-backslash
 # characters and backslash escapes.
@@ -30,6 +27,17 @@ decide() {
 }
 
 tool=$(field tool_name)
+
+# The editor bridge can reach an open editor from any folder, so this rule
+# applies everywhere.
+if [ "$tool" = "mcp__plugin_game-maker-agent_unreal__unreal_run_python" ]; then
+  decide ask "GameMakerAgent: Claude wants to run this Python script inside your Unreal Editor. It can change, save or delete assets. Read it before you allow it."
+fi
+
+project_dir="${CLAUDE_PROJECT_DIR:-$PWD}"
+if ! ls "$project_dir"/*.uproject >/dev/null 2>&1; then
+  exit 0
+fi
 
 case "$tool" in
   Write|Edit|MultiEdit|NotebookEdit)
