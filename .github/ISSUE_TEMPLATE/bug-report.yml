@@ -1,0 +1,37 @@
+name: Bug report
+description: Something doesn't work at all, such as installing, updating, or a skill that errors.
+labels: ["bug"]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What went wrong?
+      description: Include the exact error message if there is one.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Run `/plugin install game-maker-agent@game-maker-agent`
+        2. ...
+    validations:
+      required: true
+  - type: input
+    id: versions
+    attributes:
+      label: Versions
+      description: "GameMakerAgent version, Claude Code version (`claude --version`), Unreal Engine version"
+    validations:
+      required: true
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating system
+      options:
+        - Windows
+        - macOS
+        - Linux
+    validations:
+      required: true

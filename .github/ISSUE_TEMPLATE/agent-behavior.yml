@@ -1,0 +1,63 @@
+name: Agent did the wrong thing
+description: An agent or skill gave a wrong answer, broke a rule, or did something you didn't expect.
+labels: ["agent behavior"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting! Please don't paste anything private (passwords, API keys, unreleased game details you want to keep secret).
+  - type: dropdown
+    id: agent
+    attributes:
+      label: Which agent or skill?
+      options:
+        - game-designer
+        - programmer
+        - qa
+        - producer
+        - art-director
+        - technical-artist
+        - audio-director
+        - marketing
+        - /game-maker-agent:gma-init
+        - /game-maker-agent:new-feature
+        - Safety guard (hook)
+        - Not sure
+    validations:
+      required: true
+  - type: textarea
+    id: asked
+    attributes:
+      label: What did you ask?
+      description: The message you typed, as exactly as you can.
+    validations:
+      required: true
+  - type: textarea
+    id: happened
+    attributes:
+      label: What did the agent do?
+      description: Paste the important part of its answer, or describe what it changed.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect instead?
+    validations:
+      required: true
+  - type: input
+    id: versions
+    attributes:
+      label: Versions
+      description: "GameMakerAgent version (`/plugin` shows it), Claude Code version (`claude --version`), Unreal Engine version"
+      placeholder: "GameMakerAgent 0.4.0, Claude Code 2.1.296, Unreal Engine 5.7"
+    validations:
+      required: true
+  - type: dropdown
+    id: project
+    attributes:
+      label: Project type
+      options:
+        - C++ project
+        - Blueprint-only project
+        - No Unreal project yet

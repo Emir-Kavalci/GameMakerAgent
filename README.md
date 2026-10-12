@@ -62,12 +62,26 @@ In a Claude Code session, run:
 /plugin install game-maker-agent@game-maker-agent
 ```
 
+Restart Claude Code after installing.
+
+To update later, run `/plugin marketplace update game-maker-agent`, then `/plugin update game-maker-agent@game-maker-agent`, and restart Claude Code. See what changed in the [changelog](CHANGELOG.md).
+
+## Cost
+
+GameMakerAgent is free and open source. It has no paid tier, no API keys and no accounts of its own.
+
+The agents run inside Claude Code, so using them counts toward your own Claude plan's usage, the same as any other Claude Code conversation. The plugin adds no extra charge.
+
 ## Quick start
 
 1. Open a terminal in your Unreal project folder (the one that contains the `.uproject` file) and start `claude`.
 2. Run `/game-maker-agent:gma-init` and answer its question about your game.
 3. Build your first feature: `/game-maker-agent:new-feature sprint ability`
 4. Or talk to one teammate directly, for example: *"Use the producer agent to plan my first playable milestone."*
+
+## Feedback and contributing
+
+Did an agent do the wrong thing? [Open an issue](https://github.com/Emir-Kavalci/GameMakerAgent/issues/new/choose) and say what you asked and what happened; these reports are the main way the agents get better. To change the plugin yourself, see [CONTRIBUTING.md](CONTRIBUTING.md). Security problems go through [SECURITY.md](SECURITY.md), not public issues.
 
 ## Built with AI
 

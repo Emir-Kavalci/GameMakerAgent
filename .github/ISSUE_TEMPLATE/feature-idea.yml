@@ -1,0 +1,22 @@
+name: Feature idea
+description: Suggest a new agent, workflow or improvement.
+labels: ["idea"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem do you have as a solo developer?
+      description: Describe the situation, not only the solution. For example "I never know how to balance enemy health".
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: What would help?
+    validations:
+      required: true
+  - type: textarea
+    id: other
+    attributes:
+      label: Anything else?
+      description: Examples, links, or how you solve it today.
