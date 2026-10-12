@@ -4,7 +4,7 @@ A team of [Claude Code](https://code.claude.com) agents for people who make game
 
 A real game studio has programmers, designers, artists, QA testers and producers. A solo developer has to be all of them. GameMakerAgent gives Claude Code one agent per game-development role, so you can hand each kind of work to a specialist.
 
-> **Status: early preview (v0.3.0).** Built for Unreal Engine 5.7 on Windows. The core feature workflow (designer, programmer, QA, producer) has been tested end to end on a real Unreal Engine 5.7 C++ project. The art, audio and marketing agents are new and less tested. Expect rough edges.
+> **Status: early preview (v0.4.0).** Built for Unreal Engine 5.7 on Windows. The core feature workflow (designer, programmer, QA, producer) has been tested end to end on a real Unreal Engine 5.7 C++ project, and every agent has automated behavior tests (see [TESTING.md](TESTING.md)). Expect rough edges.
 
 ## What's included
 
@@ -38,6 +38,16 @@ The agent that writes code is never the one that reviews it.
 | --- | --- |
 | `/game-maker-agent:gma-init` | Run once inside your Unreal project. Creates `CLAUDE.md`, `Docs/GDD.md`, `Docs/Tasks.md`, and (if you agree) Unreal-ready `.gitignore` and `.gitattributes` files. |
 | `/game-maker-agent:new-feature <idea>` | Takes one feature from idea to reviewed code: spec → code → your build → QA review → your editor test → task list update. You approve every step. |
+
+### Safety guard
+
+Inside an Unreal project (a folder with a `.uproject` file), the plugin checks every file edit and shell command Claude is about to run:
+
+- It blocks text edits to `.uasset` and `.umap` files. These are binary, and editing them as text breaks them. Claude describes the editor steps instead.
+- It blocks changes to files inside the Unreal Engine installation folder.
+- It always asks you before a command that deletes or discards files (`rm`, `del`, `Remove-Item`, `git clean`, `git reset --hard` and similar), even if you have allowed Claude to run commands without asking.
+
+In other folders the guard does nothing. On Windows it needs Git Bash, which comes with [Git for Windows](https://git-scm.com/downloads/win). Without it the guard can't run, and Claude Code shows a hook error instead.
 
 Planned: engine integrations (MCP), more workflows, and later other engines (Unity, Godot).
 

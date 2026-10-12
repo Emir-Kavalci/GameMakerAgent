@@ -1,0 +1,5 @@
+schema_version: "1.1"
+name: art-director-no-images
+tags: [production, art-director]
+context:
+  scaffold_script: setup.sh

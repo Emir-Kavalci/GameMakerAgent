@@ -1,0 +1,5 @@
+schema_version: "1.1"
+name: tech-artist-audit-read-only
+tags: [production, technical-artist]
+context:
+  scaffold_script: setup.sh

@@ -1,0 +1,5 @@
+schema_version: "1.1"
+name: gma-init-sets-up-project
+tags: [skills, gma-init]
+context:
+  scaffold_script: setup.sh

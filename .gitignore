@@ -9,3 +9,6 @@ desktop.ini
 .DS_Store
 .vscode/
 .idea/
+
+# Eval run output (reports, transcripts)
+plugins/game-maker-agent/evals/results/

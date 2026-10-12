@@ -1,0 +1,5 @@
+schema_version: "1.1"
+name: qa-finds-bug-read-only
+tags: [core, qa]
+context:
+  scaffold_script: setup.sh

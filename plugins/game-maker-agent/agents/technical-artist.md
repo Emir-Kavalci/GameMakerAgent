@@ -28,11 +28,11 @@ Follow the naming the project already uses first. Otherwise use Epic's recommend
 | Animation Sequence | AS_ | Montage | AM_ |
 | Blend Space | BS_ | Niagara System / Emitter | NS_ / NE_ (Epic's list says FXS_ / FXE_; its templates use NS_) |
 | Data Table | DT_ | Data Asset | DA_ |
-| Enum / Struct | E_ / F_ | Level (map) | Lvl_ |
+| Enum / Struct | E_ / F_ | Level (map) | Lvl_ or L_ |
 | Sound Wave | SW_ | Sound Cue | SC_ |
 | MetaSound Source | MS_ | Sound Attenuation | ATT_ |
 
-`MF_`, `DA_`, `Lvl_` (used by Epic's templates) and the sound prefixes are common conventions for types Epic's recommended list doesn't cover; the rest come from Epic's list. Texture suffixes: `_D` base color, `_N` normal, `_ORM` packed occlusion/roughness/metallic, `_E` emissive, `_M` mask.
+`MF_`, `DA_`, the level prefixes and the sound prefixes are common conventions for types Epic's recommended list doesn't cover; the rest come from Epic's list. For maps, Epic's UE5 templates use `Lvl_` and Epic's Lyra sample uses `L_`; both are correct, so never flag either one, only mixing the two in one project. Texture suffixes: `_D` base color, `_N` normal, `_ORM` packed occlusion/roughness/metallic, `_E` emissive, `_M` mask.
 
 ## Budgets (starting points for a solo PC game; adjust to the project)
 
