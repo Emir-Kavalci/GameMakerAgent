@@ -16,7 +16,7 @@ import sys
 import threading
 
 SERVER_NAME = "game-maker-agent-unreal"
-SERVER_VERSION = "0.5.0"
+SERVER_VERSION = "0.5.1"
 SUPPORTED_PROTOCOLS = ["2025-06-18", "2025-03-26", "2024-11-05"]
 
 # MCP messages go to the real stdout; anything else printed by accident goes to stderr.

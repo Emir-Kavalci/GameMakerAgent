@@ -4,7 +4,7 @@ All notable changes to GameMakerAgent are listed here. Versions follow [Semantic
 
 To update an installed copy, run `/plugin marketplace update game-maker-agent` in Claude Code, then `/plugin update game-maker-agent@game-maker-agent`, and restart Claude Code.
 
-## [Unreleased]
+## [0.5.1] - 2026-10-23
 
 ### Fixed
 - `unreal_get_properties` no longer requires `asset_path`, so reading a placed actor by `actor_label` works.
