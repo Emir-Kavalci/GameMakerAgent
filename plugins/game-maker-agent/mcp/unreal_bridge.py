@@ -356,7 +356,7 @@ TOOLS = [
     },
     {
         "name": "unreal_get_properties",
-        "description": "Show the editable properties of an asset (for a Blueprint, its class defaults) or of one actor placed in the open level, which can override the defaults. Read-only.",
+        "description": "Show the editable properties of an asset (for a Blueprint, its class defaults) or of one actor placed in the open level, which can override the defaults. Give either asset_path or actor_label. Read-only.",
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -364,7 +364,6 @@ TOOLS = [
                 "actor_label": {"type": "string", "description": "Instead of asset_path: the name of an actor placed in the open level (as unreal_list_level_actors shows it), to see the values set on that one actor."},
                 "include_engine_properties": {"type": "boolean", "description": "Also list the properties inherited from engine classes such as Actor. Default false."},
             },
-            "required": ["asset_path"],
         },
         "annotations": {"readOnlyHint": True},
         "handler": tool_get_properties,

@@ -37,7 +37,7 @@ Ask the `game-maker-agent:programmer` agent to implement the approved spec, nami
 
 ## Step 3: Review (qa)
 
-Ask the `game-maker-agent:qa` agent to review the change against the spec's acceptance criteria and produce its QA report and manual test plan.
+Ask the `game-maker-agent:qa` agent to review the change against the spec's acceptance criteria and produce its QA report and manual test plan. The editor is still closed after the build, so QA skips its optional editor check here; the user's editor test below covers it.
 
 - If the verdict is "Needs fixes", show the problems, and with the user's agreement send the Blocker and Major problems to the `game-maker-agent:programmer` agent. Then repeat the build checkpoint and Step 3. Stop after two fix rounds and let the user decide how to continue.
 - If the verdict is "Ready to test in editor", show the manual test plan.

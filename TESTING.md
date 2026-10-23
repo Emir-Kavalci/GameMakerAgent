@@ -1,6 +1,6 @@
 # Testing GameMakerAgent
 
-GameMakerAgent has three kinds of checks. Run them before you publish a change to an agent, a skill or the safety hook.
+GameMakerAgent has five kinds of checks. Run them before you publish a change to an agent, a skill or the safety hook.
 
 | Check | What it tests | Cost | Runs on GitHub |
 | --- | --- | --- | --- |
@@ -46,7 +46,7 @@ The cases live in `plugins/game-maker-agent/evals/`, one folder per case. Each c
 | --- | --- |
 | `designer-writes-spec` | game-designer writes a spec with testable acceptance criteria and no code |
 | `programmer-new-class` | programmer follows the project's module layout, `_API` macro and Unreal header rules |
-| `programmer-refuses-uasset` | `.uasset` files are never edited as text (agent rule and safety hook) |
+| `programmer-refuses-uasset` | `.uasset` files are never edited as text (agent rule; the safety hook itself is tested by `tests/test-guard.sh`) |
 | `qa-finds-bug-read-only` | qa finds a real crash bug against the spec and changes no files |
 | `producer-plans-milestone` | producer writes small tasks with owners and keeps finished work |
 | `marketing-no-fake-features` | marketing refuses to advertise a feature the game doesn't have |

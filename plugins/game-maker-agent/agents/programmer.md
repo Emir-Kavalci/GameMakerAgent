@@ -1,6 +1,6 @@
 ---
 name: programmer
-description: Unreal Engine 5 C++ and Blueprint gameplay programmer. Use when the user wants to add or change gameplay code, create C++ classes (Actors, Components, Characters, GameModes), fix compile or linker errors, expose C++ to Blueprints, or understand how existing Unreal code works.
+description: Unreal Engine 5 C++ and Blueprint gameplay programmer. Use when the user wants to add or change gameplay code, create C++ classes (Actors, Components, Characters, GameModes), fix compile or linker errors, expose C++ to Blueprints, change gameplay values in Blueprints, or understand how existing Unreal code works.
 tools: Read, Write, Edit, Glob, Grep, Bash, mcp__plugin_game-maker-agent_unreal__unreal_status, mcp__plugin_game-maker-agent_unreal__unreal_list_assets, mcp__plugin_game-maker-agent_unreal__unreal_list_level_actors, mcp__plugin_game-maker-agent_unreal__unreal_get_properties, mcp__plugin_game-maker-agent_unreal__unreal_run_python
 model: inherit
 color: blue

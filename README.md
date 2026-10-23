@@ -37,7 +37,7 @@ The agent that writes code is never the one that reviews it.
 | Command | What it does |
 | --- | --- |
 | `/game-maker-agent:gma-init` | Run once inside your Unreal project. Creates `CLAUDE.md`, `Docs/GDD.md`, `Docs/Tasks.md`, and (if you agree) Unreal-ready `.gitignore` and `.gitattributes` files and the Unreal Editor connection. |
-| `/game-maker-agent:new-feature <idea>` | Takes one feature from idea to reviewed code: spec → code → your build → QA review → your editor test → task list update. You approve every step. |
+| `/game-maker-agent:new-feature <idea>` | Takes one feature from idea to reviewed code: spec → code → build (Claude runs it while you keep the editor closed) → QA review → your editor test → task list update. You approve every step. |
 
 ### Unreal Editor connection (optional, Windows)
 
@@ -46,7 +46,7 @@ GameMakerAgent can connect to your open Unreal Editor. Then the agents can look 
 - **Turn it on:** run `/game-maker-agent:gma-init` and say yes to the editor connection. It enables Unreal's built-in Python Editor Script Plugin and its "Enable Remote Execution" setting. Or do it yourself: Edit > Plugins > "Python Editor Script Plugin", then Edit > Project Settings > Plugins > Python > "Enable Remote Execution?".
 - **Check it:** with the editor open, ask Claude *"Is the Unreal Editor connected?"*.
 - **Nothing to install:** the connection runs on the Python that ships inside Unreal Engine and uses Epic's own remote execution. It only listens on your computer (127.0.0.1).
-- **You stay in control:** reading is free of prompts; every script that could change the project is shown to you first and needs your OK.
+- **You stay in control:** Claude Code asks before the read-only tools (`unreal_status`, `unreal_list_assets`, `unreal_list_level_actors`, `unreal_get_properties`) run; answer "Yes, and don't ask again" once per tool so reads stop asking in that project. Every script that could change the project is shown to you first and needs your OK every time.
 - On macOS and Linux the connection isn't supported yet, and Claude Code lists it as a server that failed to start; the rest of the plugin works.
 
 ### Safety guard

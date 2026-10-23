@@ -55,7 +55,7 @@ tests/                              free tests for the safety guard and the brid
 
 ## Releasing (maintainer)
 
-1. Bump `version` in `plugins/game-maker-agent/.claude-plugin/plugin.json` and the status line in `README.md`.
+1. Bump `version` in `plugins/game-maker-agent/.claude-plugin/plugin.json`, `SERVER_VERSION` in `plugins/game-maker-agent/mcp/unreal_bridge.py` and the status line in `README.md`.
 2. Move the "Unreleased" changelog entries under the new version and date.
 3. Commit, push, and tag with `claude plugin tag plugins/game-maker-agent --push`.
 4. Create a GitHub release from the tag, using the changelog entry as the description.

@@ -162,12 +162,13 @@ Design: Docs/GDD.md. Feature specs: Docs/Features/. Tasks: Docs/Tasks.md.
 - Project type: C++
 - Main module: Skyhop (export macro SKYHOP_API)
 - Platform: Windows
+- Editor connection (GameMakerAgent): off
 
 ## Conventions
 - Follow Unreal Engine naming conventions (A/U/F/E/I prefixes, b for booleans).
 - Put new C++ classes in Source/Skyhop/ following the existing flat layout.
 - Expose tunable values to the editor with UPROPERTY(EditAnywhere).
-- Do not edit .uasset or .umap files directly; describe editor steps instead.
+- Do not edit .uasset or .umap files as files; change them through the editor connection when it is on, otherwise describe editor steps.
 
 ## Build
 Close the Unreal Editor first, then run:

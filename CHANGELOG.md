@@ -4,6 +4,20 @@ All notable changes to GameMakerAgent are listed here. Versions follow [Semantic
 
 To update an installed copy, run `/plugin marketplace update game-maker-agent` in Claude Code, then `/plugin update game-maker-agent@game-maker-agent`, and restart Claude Code.
 
+## [Unreleased]
+
+### Fixed
+- `unreal_get_properties` no longer requires `asset_path`, so reading a placed actor by `actor_label` works.
+- The `CLAUDE.md` that `gma-init` writes no longer tells agents to describe editor steps when the editor connection could make the change. It now records whether the connection is on, and `producer` uses that to assign editor tasks.
+- `qa`'s read-only rule now states the one exception (the optional build), and `qa` and `game-designer` no longer treat Blueprint-only variables as missing.
+- README: the read-only editor tools do ask for permission once; build step wording in the `new-feature` row.
+
+### Changed
+- Clearer split between agents: Blueprint values go to `programmer`, sound setup to `audio-director`, store screenshots and capsules to `marketing`; `technical-artist` writes only a "Technical rules" section of the art bible.
+- `technical-artist` has the same safety rules as `programmer`.
+- `art-director` lists the shared asset prefixes itself; `art-director`, `producer` and `marketing` explain terms for beginners.
+- `game-designer` specs can have an "Open questions" section, and new specs are added to the GDD's Features table.
+
 ## [0.5.0] - 2026-10-12
 
 ### Added

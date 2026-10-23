@@ -47,6 +47,7 @@ Templates for this skill are in `${CLAUDE_SKILL_DIR}/templates/`.
    - Project type: C++ / Blueprint-only
    - Main module: <ModuleName> (export macro <PROJECTNAME>_API)
    - Platform: Windows
+   - Editor connection (GameMakerAgent): off
 
    ## Team workflow (GameMakerAgent)
    - game-designer writes a spec in Docs/Features/ before a feature is built.
@@ -59,7 +60,7 @@ Templates for this skill are in `${CLAUDE_SKILL_DIR}/templates/`.
    - Follow Unreal Engine naming conventions (A/U/F/E/I prefixes, b for booleans).
    - Put new C++ classes in Source/<ModuleName>/ following the existing layout.
    - Expose tunable values to the editor with UPROPERTY(EditAnywhere).
-   - Do not edit .uasset or .umap files directly; describe editor steps instead.
+   - Do not edit .uasset or .umap files as files; change them through the editor connection when it is on, otherwise describe editor steps.
    - Never delete Binaries/, Intermediate/, Saved/ or DerivedDataCache/ without asking.
 
    ## Build
@@ -90,6 +91,7 @@ Templates for this skill are in `${CLAUDE_SKILL_DIR}/templates/`.
      [/Script/PythonScriptPlugin.PythonScriptPluginSettings]
      bRemoteExecution=True
      ```
+   - In `CLAUDE.md`, change the line `Editor connection (GameMakerAgent): off` to `on`, so agents that can't check the editor themselves know it.
    - Tell the user to open the editor again, and that they can check the connection any time by asking "Is the Unreal Editor connected?".
    For a project that is not on Windows, skip this step and say the connection is Windows-only for now.
 

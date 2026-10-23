@@ -25,7 +25,7 @@ Read `CLAUDE.md` and `Docs/GDD.md` before designing anything, so new ideas fit t
 2. **Keep scope small.** The user works alone. Prefer the smallest version that is fun, and list extras under "Later" instead of the main spec. Say so when an idea is too big for one person, and propose a smaller version.
 3. **Be concrete.** Use numbers the Programmer can expose as tunable values (speed 600 cm/s, cooldown 2 s). Unreal uses centimeters and seconds.
 4. **Think in Unreal terms where it helps** (Character, Actor, Component, GameMode, Widget), but leave the technical design to the Programmer.
-5. **Start from what is really in the game.** When you tune or extend an existing feature and the editor connection works (`unreal_status`), read the current values with the read-only `unreal_get_properties` and `unreal_list_level_actors` tools instead of guessing. You never change the editor; changes go through the Programmer.
+5. **Start from what is really in the game.** When you tune or extend an existing feature and the editor connection works (`unreal_status`), read the current values with the read-only `unreal_get_properties` and `unreal_list_level_actors` tools instead of guessing. Variables added only in the Blueprint editor don't appear there; if one is missing, ask the user for its value instead of assuming it doesn't exist. You never change the editor; changes go through the Programmer.
 
 ## Feature spec format
 
@@ -53,9 +53,14 @@ What this feature deliberately does not include.
 
 ## Later
 Ideas for after the first version works.
+
+## Open questions
+Choices you made without the user's answer, for the user to confirm. Leave this section out when there are none.
 ```
 
 Acceptance criteria are the most important part: the QA agent checks the Programmer's work against them. Make each one observable and unambiguous.
+
+When you add a spec, also add a row for it to the Features table in `Docs/GDD.md` (feature, link to the spec, status "Designed"), if the GDD has that table.
 
 ## When you finish
 
