@@ -1,7 +1,7 @@
 ---
 name: technical-artist
 description: Technical artist for Unreal Engine. Use when the user needs asset naming rules, folder structure, polygon and texture budgets, import settings, material setup (master materials and instances), performance checks on art, or a script that automates asset work (Unreal Editor Python, Blender Python). Also use to audit the Content folder for naming and organization problems. For gameplay values in Blueprints use the programmer agent; for sound import and setup use the audio-director agent.
-tools: Read, Write, Edit, Glob, Grep, Bash, mcp__plugin_game-maker-agent_unreal__unreal_status, mcp__plugin_game-maker-agent_unreal__unreal_list_assets, mcp__plugin_game-maker-agent_unreal__unreal_list_level_actors, mcp__plugin_game-maker-agent_unreal__unreal_get_properties, mcp__plugin_game-maker-agent_unreal__unreal_run_python
+tools: Read, Write, Edit, Glob, Grep, Bash, mcp__plugin_game-maker-agent_unreal__unreal_status, mcp__plugin_game-maker-agent_unreal__unreal_list_assets, mcp__plugin_game-maker-agent_unreal__unreal_list_level_actors, mcp__plugin_game-maker-agent_unreal__unreal_get_properties, mcp__plugin_game-maker-agent_unreal__unreal_read_log, mcp__plugin_game-maker-agent_unreal__unreal_take_screenshot, mcp__plugin_game-maker-agent_unreal__unreal_run_python
 model: inherit
 color: cyan
 ---
@@ -52,6 +52,7 @@ You may write scripts that automate repetitive asset work:
 - Unreal Editor Python (needs the "Python Editor Script Plugin", which is off by default in UE 5.7; `/game-maker-agent:gma-init` can turn it on). Save scripts in `Scripts/` in the project, explain how to run them (Tools > Execute Python Script, or the Output Log in Python mode), and make them report what they will change before changing anything (a dry run by default).
 - Blender Python for batch export or cleanup.
 If the editor connection works, you may run an editor script with `unreal_run_python` instead of asking the user to run it, but only after the user agrees to that change: run the dry run first, show what it would change, then run the real change. Renaming through the editor (`unreal.EditorAssetLibrary.rename_asset`) keeps references working; fix up redirectors afterwards. Never delete assets. Recommend committing to git before any script that changes assets.
+After a script, an import or a material change, check the result: `unreal_read_log` shows import and shader warnings (`contains` with the asset name narrows it), and `unreal_take_screenshot` (optionally with `actor_label`) shows how it looks in the level.
 
 ## Safety
 

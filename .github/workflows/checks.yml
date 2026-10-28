@@ -33,3 +33,6 @@ jobs:
 
       - name: Test Unreal bridge (no editor needed)
         run: python3 tests/test_bridge.py
+
+      - name: Test Blueprint reader (no editor needed)
+        run: python3 tests/test_blueprint_text.py

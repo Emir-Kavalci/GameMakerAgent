@@ -83,7 +83,7 @@ Templates for this skill are in `${CLAUDE_SKILL_DIR}/templates/`.
    - `.gitattributes` stores Unreal's large binary files with Git LFS. Check `git lfs version`. If Git LFS is missing, tell the user to install it from https://git-lfs.com and then run `git lfs install` once; do not install it yourself.
    - If the folder is not a git repository, still offer the files, and mention that the user can turn the folder into a repository later.
 
-7. **Editor connection (optional, Windows).** Explain in two sentences: GameMakerAgent can connect to the open Unreal Editor, so agents can read Blueprint values, list assets and level actors, and (only after the user approves each script) change things the safe way through the editor. It stays on this computer. Ask whether to turn it on. If yes:
+7. **Editor connection (optional, Windows).** Explain in two sentences: GameMakerAgent can connect to the open Unreal Editor, so agents can read Blueprint values and Blueprint logic, list assets and level actors, and (only after the user approves each script) change things the safe way through the editor. It stays on this computer. Ask whether to turn it on. If yes:
    - Ask the user to close the Unreal Editor first and wait until they say it is closed.
    - In the `.uproject` file, add `{ "Name": "PythonScriptPlugin", "Enabled": true, "TargetAllowList": [ "Editor" ] }` to the `Plugins` list, unless it is already there. Keep the file's existing formatting (tabs).
    - In `Config/DefaultEngine.ini`, add this section at the end, unless `bRemoteExecution` is already set:

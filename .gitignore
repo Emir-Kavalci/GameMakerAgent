@@ -9,6 +9,7 @@ desktop.ini
 .DS_Store
 .vscode/
 .idea/
+__pycache__/
 
 # Eval run output (reports, transcripts)
 plugins/game-maker-agent/evals/results/

@@ -4,6 +4,24 @@ All notable changes to GameMakerAgent are listed here. Versions follow [Semantic
 
 To update an installed copy, run `/plugin marketplace update game-maker-agent` in Claude Code, then `/plugin update game-maker-agent@game-maker-agent`, and restart Claude Code.
 
+## [Unreleased]
+
+### Added
+- `unreal_read_blueprint`: reads a Blueprint (Actor, Widget or Anim Blueprint) as text: parent class, components, variables with defaults, and every graph as indented steps with the values wired into each node. It marks events declared in C++ and C++ functions the Blueprint calls. The editor exports the Blueprint as T3D text and the bridge turns it into steps, so nothing extra is installed.
+- `unreal_list_assets` shows each Blueprint's parent class and can filter by it (`parent_class`), to find the Blueprints built on a C++ class.
+- `tests/test_blueprint_text.py`, a free test of the Blueprint reader, runs on every push.
+- `unreal_read_log`: reads the editor's Output Log file: errors and warnings by default, or everything since the last Play In Editor start, with repeats folded and engine network noise hidden. Works with the editor closed (the last session's log).
+- `unreal_take_screenshot`: a picture of the level from the editor camera, or of the game view with its UI during Play In Editor, returned as an image. It can look at one actor without moving the user's camera, works with the editor in the background, and keeps nothing on disk.
+- `unreal_get_properties` also lists C++ properties that Blueprints and Python can't see by name (protected ones such as `UPROPERTY(EditAnywhere)` members), found from the project's C++ headers.
+
+### Changed
+- `programmer` reads the Blueprints built on a C++ class before changing it, so it doesn't break nodes they use or repeat logic they already have.
+- `qa` checks Blueprints that use changed C++ and reviews Blueprint logic; `game-designer` reads a feature's Blueprint to see how it behaves now.
+- `programmer` and `qa` read the Output Log after the user plays; `programmer`, `qa` and `technical-artist` can look at the level with a screenshot; `art-director` can take its own screenshot to review against the art bible.
+
+### Fixed
+- Bridge scripts no longer write Python deprecation warnings into the project's Output Log.
+
 ## [0.5.1] - 2026-10-23
 
 ### Fixed

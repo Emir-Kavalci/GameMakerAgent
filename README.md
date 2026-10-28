@@ -41,12 +41,29 @@ The agent that writes code is never the one that reviews it.
 
 ### Unreal Editor connection (optional, Windows)
 
-GameMakerAgent can connect to your open Unreal Editor. Then the agents can look at the real project instead of guessing: read a Blueprint's default values or one placed actor's values, list assets with their real types, and list the actors in the open level. With your approval for each script, they can also change things the safe way, through the editor (for example set a Blueprint value or rename assets without breaking references).
+GameMakerAgent can connect to your open Unreal Editor. Then the agents can look at the real project instead of guessing: read a Blueprint's default values or one placed actor's values (including protected C++ properties), list assets with their real types, list the actors in the open level, read the Output Log after you play, and take a screenshot of the level or of the game while you play. With your approval for each script, they can also change things the safe way, through the editor (for example set a Blueprint value or rename assets without breaking references).
+
+**Agents read your Blueprints, not only your C++.** `unreal_read_blueprint` turns a Blueprint (Actor, Widget or Anim Blueprint) into readable text: its parent class, components, variables with their defaults, and every graph as indented steps. It marks what comes from your C++, such as events declared in C++ and C++ functions the Blueprint calls. So before the `programmer` changes a C++ class, it reads the Blueprints built on it, and it won't break the nodes they use or write logic you already have in a Blueprint. Example output:
+
+```text
+Parent class: CoinBase (C++ in this project: /Script/MyGame.CoinBase)
+
+== Event Graph ==
+Event OnCollected [event declared in C++] (Collector: Actor)
+  Branch(Condition = CoinValue > 10.0)
+    True:
+      // Give the reward
+      CoinBase.AddScore [C++](Amount = 5)
+```
+
+The connection reads Blueprint graphs but doesn't add or rewire nodes; for a Blueprint logic change the agent moves the logic to C++ (if you agree) or tells you which nodes to change.
+
+**Agents see what happened when you played.** After you test in the editor, `unreal_read_log` reads the Output Log since the last Play: errors such as "Accessed None", Blueprint errors and your own log lines, with repeats folded and engine network noise hidden. It reads the log file, so it also works after the editor has closed or crashed. `unreal_take_screenshot` gives the agent a picture of the level (or of the game view, with its UI, while you play), so `programmer`, `qa`, `technical-artist` and `art-director` can check how a change looks. It can look at one actor, and your own camera never moves. The editor only has to be open: it can stay behind other windows. The picture goes to the agent and is deleted right away; nothing is saved in your project.
 
 - **Turn it on:** run `/game-maker-agent:gma-init` and say yes to the editor connection. It enables Unreal's built-in Python Editor Script Plugin and its "Enable Remote Execution" setting. Or do it yourself: Edit > Plugins > "Python Editor Script Plugin", then Edit > Project Settings > Plugins > Python > "Enable Remote Execution?".
 - **Check it:** with the editor open, ask Claude *"Is the Unreal Editor connected?"*.
 - **Nothing to install:** the connection runs on the Python that ships inside Unreal Engine and uses Epic's own remote execution. It only listens on your computer (127.0.0.1).
-- **You stay in control:** Claude Code asks before the read-only tools (`unreal_status`, `unreal_list_assets`, `unreal_list_level_actors`, `unreal_get_properties`) run; answer "Yes, and don't ask again" once per tool so reads stop asking in that project. Every script that could change the project is shown to you first and needs your OK every time.
+- **You stay in control:** Claude Code asks before the read-only tools (`unreal_status`, `unreal_list_assets`, `unreal_list_level_actors`, `unreal_get_properties`, `unreal_read_blueprint`, `unreal_read_log`, `unreal_take_screenshot`) run; answer "Yes, and don't ask again" once per tool so reads stop asking in that project. Every script that could change the project is shown to you first and needs your OK every time.
 - On macOS and Linux the connection isn't supported yet, and Claude Code lists it as a server that failed to start; the rest of the plugin works.
 
 ### Safety guard

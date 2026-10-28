@@ -1,12 +1,13 @@
 # Testing GameMakerAgent
 
-GameMakerAgent has five kinds of checks. Run them before you publish a change to an agent, a skill or the safety hook.
+GameMakerAgent has six kinds of checks. Run them before you publish a change to an agent, a skill or the safety hook.
 
 | Check | What it tests | Cost | Runs on GitHub |
 | --- | --- | --- | --- |
 | `claude plugin validate` | Manifests and the agent, skill and hook files are well-formed | Free | Yes, on every push |
 | `tests/test-guard.sh` | The safety hook blocks and allows the right tool calls | Free | Yes, on every push |
-| `tests/test_bridge.py` | The Unreal Editor bridge speaks MCP correctly (no editor needed) | Free | Yes, on every push |
+| `tests/test_bridge.py` | The Unreal Editor bridge speaks MCP correctly; the log reader and C++ header scan work (no editor needed) | Free | Yes, on every push |
+| `tests/test_blueprint_text.py` | Blueprint export text is turned into the right readable steps (no editor needed) | Free | Yes, on every push |
 | Bridge with a live editor | The bridge reads and changes a real open project | Free | No, run it yourself (see below) |
 | Eval suite (`claude plugin eval`) | Each agent and skill behaves the way its instructions say | Uses the Claude plan of whoever runs it | No, run it yourself |
 
@@ -21,6 +22,7 @@ claude plugin validate .
 claude plugin validate plugins/game-maker-agent
 bash tests/test-guard.sh
 python tests/test_bridge.py
+python tests/test_blueprint_text.py
 ```
 
 ## Unreal Editor bridge with a live editor
@@ -30,6 +32,9 @@ The bridge (`plugins/game-maker-agent/mcp/`) can only be fully tested against a 
 1. Open an Unreal 5.7 test project whose editor connection is on (see the README).
 2. In a terminal in that project folder, start Claude Code with your working copy: `claude --plugin-dir <repo>/plugins/game-maker-agent`.
 3. Ask: "Is the Unreal Editor connected?", then "List the Blueprints in my project", "What are the default values of <a Blueprint>?" and "List the actors in the open level".
+   Then "Read <a Blueprint> and explain its logic": open the same Blueprint in the editor and check that the steps, branches and values match the graph. Try an Actor, a Widget and an Anim Blueprint, and one whose parent class is your C++.
+   Then "Show me the level" and "Take a screenshot of <an actor in the level>" (your camera and selection must not change), with the editor behind other windows, and "Are there errors in the Output Log?". Press Play, walk around, stop, and ask "What did the log say while I played?".
+   Then "What are the values of <a Blueprint built on your C++ class>?": protected C++ properties must be listed under their C++ names.
 4. Ask for a small change (for example "set <Blueprint>'s <value> to 2"). Claude Code must show you the script and wait for your OK before it runs. Afterwards ask Claude to set it back, or close the editor without saving.
 
 The eval suite can't cover the bridge, because eval runs have no editor.

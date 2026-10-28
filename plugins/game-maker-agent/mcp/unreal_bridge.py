@@ -13,7 +13,13 @@ Everything stays on this computer: remote execution only listens on 127.0.0.1.
 import json
 import os
 import sys
+import tempfile
 import threading
+
+# The bridge runs with python -I, which leaves this folder off the import path.
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import blueprint_text  # noqa: E402
+import editor_log  # noqa: E402
 
 SERVER_NAME = "game-maker-agent-unreal"
 SERVER_VERSION = "0.5.1"
@@ -172,7 +178,8 @@ def _query_editor(code):
 # ---------------------------------------------------------------------------
 # Tools. The editor-side code is kept small and read-only except run_python.
 
-_PRELUDE = "import unreal, json\ndef _out(data):\n    print('" + _JSON_MARK + "' + json.dumps(data, default=str))\n"
+# Reading every property also touches deprecated aliases; keep their warnings out of the user's log.
+_PRELUDE = "import unreal, json, warnings\nwarnings.simplefilter('ignore', DeprecationWarning)\ndef _out(data):\n    print('" + _JSON_MARK + "' + json.dumps(data, default=str))\n"
 
 
 def tool_status(_args):
@@ -195,9 +202,18 @@ def tool_status(_args):
 def tool_list_assets(args):
     path = args.get("path") or "/Game"
     class_name = args.get("class_name") or ""
+    parent_class = args.get("parent_class") or ""
     limit = int(args.get("limit") or 200)
+    # Blueprints carry their parent class and nearest C++ ancestor as asset registry tags.
     code = _PRELUDE + (
         "registry = unreal.AssetRegistryHelpers.get_asset_registry()\n"
+        "def short(tag):\n"
+        "    value = str(tag or '')\n"
+        "    if value in ('', 'None'):\n"
+        "        return ''\n"
+        "    value = value.split(\"'\")[-2] if \"'\" in value else value\n"
+        "    value = value.rsplit('.', 1)[-1]\n"
+        "    return value[:-2] if value.endswith('_C') else value\n"
         "rows = []\n"
         "for a in registry.get_assets_by_path({path!r}, recursive=True):\n"
         "    cls = str(a.asset_class_path.asset_name)\n"
@@ -205,15 +221,26 @@ def tool_list_assets(args):
         "        continue  # one-file-per-actor level data, not real assets\n"
         "    if {cls!r} and cls.lower() != {cls!r}.lower():\n"
         "        continue\n"
-        "    rows.append({{'path': str(a.package_name), 'class': cls}})\n"
+        "    parent = short(a.get_tag_value('ParentClass'))\n"
+        "    native = short(a.get_tag_value('NativeParentClass'))\n"
+        "    if {parent!r} and {parent!r}.lower() not in (parent.lower(), native.lower()):\n"
+        "        continue\n"
+        "    rows.append({{'path': str(a.package_name), 'class': cls, 'parent': parent, 'native': native}})\n"
         "rows.sort(key=lambda r: r['path'])\n"
         "_out({{'total': len(rows), 'assets': rows[:{limit}]}})\n"
-    ).format(path=path, cls=class_name, limit=limit)
+    ).format(path=path, cls=class_name, parent=parent_class, limit=limit)
     ok, data = _query_editor(code)
     if not ok:
         return False, data
-    lines = ["{0} assets under {1}{2}:".format(data["total"], path, " of class " + class_name if class_name else "")]
-    lines += ["- {0} ({1})".format(r["path"], r["class"]) for r in data["assets"]]
+    lines = ["{0} assets under {1}{2}{3}:".format(
+        data["total"], path, " of class " + class_name if class_name else "", " based on " + parent_class if parent_class else "")]
+    for r in data["assets"]:
+        based = ""
+        if r.get("parent"):
+            based = ", parent " + r["parent"]
+            if r.get("native") and r["native"] != r["parent"]:
+                based += ", C++ base " + r["native"]
+        lines.append("- {0} ({1}{2})".format(r["path"], r["class"], based))
     if data["total"] > len(data["assets"]):
         lines.append("... {0} more not shown (raise limit or narrow the path).".format(data["total"] - len(data["assets"])))
     return True, "\n".join(lines)
@@ -242,6 +269,49 @@ def tool_list_level_actors(args):
     if data["total"] > len(data["actors"]):
         lines.append("... {0} more not shown.".format(data["total"] - len(data["actors"])))
     return True, "\n".join(lines)
+
+
+def _cpp_property_names(project_dir):
+    """Names of the UPROPERTYs declared in the project's C++ headers (Source and project
+    plugins). Python lists only the properties Blueprints can see, so protected ones such
+    as UPROPERTY(EditAnywhere) members are missing from dir(); they can still be read by name."""
+    names = set()
+    roots = [os.path.join(project_dir, "Source"), os.path.join(project_dir, "Plugins")]
+    for root in roots:
+        for folder, _dirs, files in os.walk(root):
+            for name in files:
+                if not name.endswith(".h"):
+                    continue
+                try:
+                    with open(os.path.join(folder, name), encoding="utf-8", errors="replace") as handle:
+                        text = handle.read()
+                except OSError:
+                    continue
+                names.update(_uproperty_names(text))
+    return sorted(names)
+
+
+def _uproperty_names(text):
+    found = []
+    start = text.find("UPROPERTY")
+    while start != -1:
+        # skip the balanced (...) after UPROPERTY, then the declaration runs to the next ';'
+        i = text.find("(", start)
+        depth = 0
+        while 0 <= i < len(text):
+            depth += {"(": 1, ")": -1}.get(text[i], 0)
+            i += 1
+            if depth == 0:
+                break
+        end = text.find(";", i)
+        if i < 0 or end < 0:
+            break
+        declaration = text[i:end].split("=")[0].split("{")[0].split(":")[0].split("[")[0]
+        words = [w for w in declaration.replace("*", " ").replace("&", " ").replace(">", " ").split() if w]
+        if words and words[-1].isidentifier():
+            found.append(words[-1])
+        start = text.find("UPROPERTY", end)
+    return found
 
 
 def tool_get_properties(args):
@@ -279,21 +349,32 @@ def tool_get_properties(args):
         "        if hasattr(base, 'static_class') and not base.static_class().get_path_name().startswith('/Script/' + unreal.SystemLibrary.get_game_name() + '.'):\n"
         "            engine_names = set(dir(base))\n"
         "            break\n"
-        "    own, engine = {{}}, {{}}\n"
+        "    own, engine, hidden = {{}}, {{}}, {{}}\n"
+        "    def read(name):\n"
+        "        value = target.get_editor_property(name)\n"
+        "        if callable(value):\n"
+        "            raise TypeError(name)\n"
+        "        text = re.sub(r' \\(0x[0-9A-Fa-f]+\\)', '', str(value))\n"
+        "        return text if len(text) <= 160 else text[:157] + '...'\n"
         "    for name in dir(target):\n"
         "        if name.startswith('_'):\n"
         "            continue\n"
         "        try:\n"
-        "            value = target.get_editor_property(name)\n"
+        "            (engine if name in engine_names else own)[name] = read(name)\n"
         "        except Exception:\n"
         "            continue\n"
-        "        if callable(value):\n"
+        "    # C++ UPROPERTYs that Python doesn't list (protected, not visible to Blueprints)\n"
+        "    listed = set(n.replace('_', '').lower() for n in dir(target))\n"
+        "    for name in {cpp_names!r}:\n"
+        "        key = name.lower()\n"
+        "        if key in listed or (name[:1] == 'b' and name[1:2].isupper() and key[1:] in listed):\n"
         "            continue\n"
-        "        text = re.sub(r' \\(0x[0-9A-Fa-f]+\\)', '', str(value))\n"
-        "        text = text if len(text) <= 160 else text[:157] + '...'\n"
-        "        (engine if name in engine_names else own)[name] = text\n"
-        "    _out({{'kind': kind, 'own': own, 'engine': engine}})\n"
-    ).format(asset=asset)
+        "        try:\n"
+        "            hidden[name] = read(name)\n"
+        "        except Exception:\n"
+        "            continue\n"
+        "    _out({{'kind': kind, 'own': own, 'engine': engine, 'hidden': hidden}})\n"
+    ).format(asset=asset, cpp_names=_cpp_property_names(_project_dir()))
     ok, data = _query_editor(code)
     if not ok:
         return False, data
@@ -302,13 +383,240 @@ def tool_get_properties(args):
     lines = ["{0} ({1})".format(asset, data["kind"])]
     lines.append("Project properties ({0}):".format(len(data["own"])))
     lines += ["- {0} = {1}".format(k, v) for k, v in sorted(data["own"].items())] or ["- (none)"]
+    if data.get("hidden"):
+        lines.append("C++ properties Blueprints can't see (protected or without BlueprintReadOnly/ReadWrite; read and set them by this C++ name) ({0}):".format(len(data["hidden"])))
+        lines += ["- {0} = {1}".format(k, v) for k, v in sorted(data["hidden"].items())]
     if include_engine:
         lines.append("Inherited engine properties ({0}):".format(len(data["engine"])))
         lines += ["- {0} = {1}".format(k, v) for k, v in sorted(data["engine"].items())]
     else:
         lines.append("{0} inherited engine properties not shown (set include_engine_properties to see them).".format(len(data["engine"])))
-    lines.append("Variables added only in the Blueprint editor aren't listed; read one with unreal_run_python and get_editor_property('<Name>').")
+    lines.append("Variables added only in the Blueprint editor aren't listed; unreal_read_blueprint shows them with their defaults.")
     return True, "\n".join(lines)
+
+
+# The editor exports the Blueprint as T3D text (what copying nodes gives you) into a
+# temporary file; blueprint_text turns it into readable steps here, outside the editor.
+_READ_BLUEPRINT = (
+    "import re\n"
+    "bp = unreal.load_asset({asset!r})\n"
+    "if not isinstance(bp, unreal.Blueprint):\n"
+    "    _out({{'error': 'No Blueprint at ' + {asset!r} + (' (it is a ' + bp.get_class().get_name() + ')' if bp else '')}})\n"
+    "else:\n"
+    "    task = unreal.AssetExportTask()\n"
+    "    task.object = bp\n"
+    "    task.exporter = unreal.ObjectExporterT3D()\n"
+    "    task.filename = {path!r}\n"
+    "    task.automated = True\n"
+    "    task.prompt = False\n"
+    "    task.replace_identical = True\n"
+    "    exported = unreal.Exporter.run_asset_export_task(task)\n"
+    "    components = []\n"
+    "    try:\n"
+    "        lib = unreal.SubobjectDataBlueprintFunctionLibrary\n"
+    "        subsystem = unreal.get_engine_subsystem(unreal.SubobjectDataSubsystem)\n"
+    "        seen = set()\n"
+    "        for handle in subsystem.k2_gather_subobject_data_for_blueprint(bp):\n"
+    "            data = lib.get_data(handle)\n"
+    "            name = str(lib.get_variable_name(data))\n"
+    "            if not lib.is_component(data) or name in seen:\n"
+    "                continue\n"
+    "            seen.add(name)\n"
+    "            template = lib.get_object_for_blueprint(data, bp) or lib.get_associated_object(data)\n"
+    "            parent = lib.get_data(lib.get_parent_handle(data))\n"
+    "            components.append({{\n"
+    "                'name': name,\n"
+    "                'class': template.get_class().get_name() if template else '?',\n"
+    "                'parent': str(lib.get_variable_name(parent)) if lib.is_valid(parent) and lib.is_component(parent) else '',\n"
+    "                'native': lib.is_native_component(data),\n"
+    "                'inherited': lib.is_inherited_component(data),\n"
+    "            }})\n"
+    "    except Exception:\n"
+    "        pass  # not an Actor Blueprint\n"
+    "    values = {{}}\n"
+    "    try:\n"
+    "        text = open({path!r}, 'rb').read().decode('utf-8', 'replace')\n"
+    "        cdo = unreal.get_default_object(bp.generated_class())\n"
+    "        for name in re.findall(r'NewVariables\\(\\d+\\)=\\(VarName=\"([^\"]+)\"', text):\n"
+    "            try:\n"
+    "                value = re.sub(r' \\(0x[0-9A-Fa-f]+\\)', '', str(cdo.get_editor_property(name)))\n"
+    "                values[name] = value if len(value) <= 160 else value[:157] + '...'\n"
+    "            except Exception:\n"
+    "                pass\n"
+    "    except Exception:\n"
+    "        pass\n"
+    "    project_file = unreal.Paths.convert_relative_path_to_full(unreal.Paths.get_project_file_path())\n"
+    "    try:\n"
+    "        modules = [m['Name'] for m in json.load(open(project_file)).get('Modules', [])]\n"
+    "    except Exception:\n"
+    "        modules = []\n"
+    "    modules.append(unreal.SystemLibrary.get_game_name())\n"
+    "    _out({{'exported': exported, 'kind': bp.get_class().get_name(), 'components': components, 'values': values, 'modules': modules}})\n"
+)
+
+
+def _read_text_file(path):
+    with open(path, "rb") as handle:
+        raw = handle.read()
+    if raw[:2] in (b"\xff\xfe", b"\xfe\xff"):
+        return raw.decode("utf-16")
+    return raw.decode("utf-8-sig", "replace")
+
+
+def tool_read_blueprint(args):
+    asset = args.get("asset_path") or ""
+    if not asset:
+        return False, "Give asset_path, for example /Game/Blueprints/BP_Coin (unreal_list_assets with class_name Blueprint lists them)."
+    graph = args.get("graph") or ""
+    handle, path = tempfile.mkstemp(prefix="gma_blueprint_", suffix=".t3d")
+    os.close(handle)
+    try:
+        ok, data = _query_editor(_PRELUDE + _READ_BLUEPRINT.format(asset=asset, path=path))
+        if not ok:
+            return False, data
+        if "error" in data:
+            return False, data["error"]
+        if not data.get("exported") or not os.path.getsize(path):
+            return False, "The editor could not export " + asset + "."
+        reader = blueprint_text.BlueprintReader(_read_text_file(path), data.get("modules") or [], data.get("components"), data.get("values"))
+    finally:
+        try:
+            os.remove(path)
+        except OSError:
+            pass
+    text = reader.text(only=graph or None)
+    if text is None:
+        return False, "No graph named {0} in {1}. Its graphs: {2}".format(graph, asset, ", ".join(reader.graph_names()))
+    return True, "{0} ({1})\n{2}".format(asset, data.get("kind", "Blueprint"), text)
+
+
+def tool_read_log(args):
+    # The log is a file in the project, so this works without the editor (and after a crash).
+    path = editor_log.find_log(_project_dir())
+    if path is None and remote_execution is not None:
+        ok, data = _query_editor(_PRELUDE + "_out({'dir': unreal.Paths.convert_relative_path_to_full(unreal.Paths.project_log_dir()), 'name': unreal.SystemLibrary.get_game_name()})\n")
+        if ok:
+            candidate = os.path.join(data["dir"], data["name"] + ".log")
+            path = candidate if os.path.isfile(candidate) else None
+    if path is None:
+        return False, "No editor log found. It is Saved/Logs/<Project>.log in the project folder and appears after the editor has been opened once."
+    text, cut = editor_log.read_tail(path)
+    answer = editor_log.report(
+        text,
+        level=args.get("level") or "warning",
+        contains=args.get("contains") or "",
+        category=args.get("category") or "",
+        since_pie=bool(args.get("since_play")),
+        limit=int(args.get("limit") or 100),
+        include_noise=bool(args.get("include_noise")),
+    )
+    header = "Log: " + path + (" (only its last {0} MB read)".format(editor_log.MAX_READ_BYTES // (1024 * 1024)) if cut else "")
+    return True, header + "\n" + answer
+
+
+# In the editor a temporary Scene Capture camera renders the level straight into an
+# image: it works while the editor is in the background (its viewport doesn't redraw
+# then) and the user's own camera never moves. The camera is a transient actor (never
+# saved), removed afterwards, and the user's selection is restored.
+# During Play In Editor, Python can't spawn into the play world, so the game's own
+# viewport is saved with HighResShot instead; the game keeps drawing while it runs.
+_SCREENSHOT = (
+    "editor = unreal.get_editor_subsystem(unreal.UnrealEditorSubsystem)\n"
+    "actors = unreal.get_editor_subsystem(unreal.EditorActorSubsystem)\n"
+    "game = editor.get_game_world()\n"
+    "label = {label!r}\n"
+    "if game:\n"
+    "    unreal.SystemLibrary.execute_console_command(game, 'HighResShot {width}x{height} filename=\"' + {folder!r}.replace('\\\\', '/') + '/shot.png\"')\n"
+    "    _out({{'pie': True}})\n"
+    "else:\n"
+    "    location, rotation = editor.get_level_viewport_camera_info()\n"
+    "    target = next((a for a in actors.get_all_level_actors() if a.get_actor_label() == label), None) if label else None\n"
+    "    if label and target is None:\n"
+    "        _out({{'error': 'No actor labeled ' + label + ' in the open level'}})\n"
+    "    else:\n"
+    "        if target is not None:\n"
+    "            center, extent = target.get_actor_bounds(False)\n"
+    "            rotation = unreal.Rotator(roll=0.0, pitch=-25.0, yaw=rotation.yaw)\n"
+    "            location = center - rotation.get_forward_vector() * max(extent.length() * 2.5, 300.0)\n"
+    "        world = editor.get_editor_world()\n"
+    "        selected = actors.get_selected_level_actors()\n"
+    "        capture = actors.spawn_actor_from_class(unreal.SceneCapture2D, location, rotation, transient=True)\n"
+    "        try:\n"
+    "            component = capture.capture_component2d\n"
+    "            image = unreal.RenderingLibrary.create_render_target2d(world, {width}, {height}, unreal.TextureRenderTargetFormat.RTF_RGBA8_SRGB)\n"
+    "            component.set_editor_property('texture_target', image)\n"
+    "            component.set_editor_property('capture_source', unreal.SceneCaptureSource.SCS_FINAL_TONE_CURVE_HDR)\n"
+    "            component.set_editor_property('capture_every_frame', False)\n"
+    "            component.set_editor_property('capture_on_movement', False)\n"
+    "            component.set_editor_property('fov_angle', 90.0)\n"
+    "            component.capture_scene()\n"
+    "            unreal.RenderingLibrary.export_render_target(world, image, {folder!r}, 'shot.png')\n"
+    "        finally:\n"
+    "            actors.destroy_actor(capture)\n"
+    "            actors.set_selected_level_actors(selected)\n"
+    "        _out({{'pie': False}})\n"
+)
+
+
+def _remove_folder(folder):
+    for name in os.listdir(folder):
+        try:
+            os.remove(os.path.join(folder, name))
+        except OSError:
+            pass
+    try:
+        os.rmdir(folder)
+    except OSError:
+        pass
+
+
+def tool_take_screenshot(args):
+    import base64
+    import time
+
+    width = max(320, min(int(args.get("width") or 1280), 1920))
+    height = max(180, min(int(args.get("height") or 720), 1080))
+    label = args.get("actor_label") or ""
+    # Images only live in the system temp folder until they are sent. A game screenshot
+    # that arrived after an earlier call stopped waiting is removed here.
+    temp = tempfile.gettempdir()
+    for name in os.listdir(temp):
+        stale = os.path.join(temp, name)
+        if name.startswith("gma_shot_") and os.path.isdir(stale) and time.time() - os.path.getmtime(stale) > 120:
+            _remove_folder(stale)
+    folder = tempfile.mkdtemp(prefix="gma_shot_")
+    path = os.path.join(folder, "shot.png")
+    try:
+        ok, data = _query_editor(_PRELUDE + _SCREENSHOT.format(label=label, width=width, height=height, folder=folder))
+        if not ok:
+            return False, data
+        if "error" in data:
+            return False, data["error"]
+        if data.get("pie"):
+            # HighResShot writes on a later frame; wait until the file stops growing.
+            deadline, size = time.time() + 30, -1
+            while time.time() < deadline:
+                time.sleep(0.5)
+                if os.path.isfile(path):
+                    if os.path.getsize(path) == size > 0:
+                        break
+                    size = os.path.getsize(path)
+            if size <= 0:
+                return False, "The game didn't draw a frame within 30 seconds. Is Play In Editor paused or minimized?"
+        if not os.path.isfile(path) or not os.path.getsize(path):
+            return False, "The editor could not render the screenshot."
+        with open(path, "rb") as handle:
+            image = base64.b64encode(handle.read()).decode("ascii")
+    finally:
+        _remove_folder(folder)
+    if data.get("pie"):
+        what = "the game view (Play In Editor is running), with its on-screen UI" + ("; actor_label is ignored while playing" if label else "")
+    elif label:
+        what = "the level, looking at {0} (it is in the middle of the picture, possibly hidden by other objects); editor icons are not shown and lighting can look a little darker than in the viewport".format(label)
+    else:
+        what = "the level from the editor camera; editor icons are not shown and lighting can look a little darker than in the viewport"
+    caption = "{0}x{1} picture of {2}.".format(width, height, what)
+    return True, [{"type": "text", "text": caption}, {"type": "image", "data": image, "mimeType": "image/png"}]
 
 
 def tool_run_python(args):
@@ -329,12 +637,13 @@ TOOLS = [
     },
     {
         "name": "unreal_list_assets",
-        "description": "List assets in the open project (path and class), from the editor's asset registry. Read-only. Use this instead of guessing from .uasset file names.",
+        "description": "List assets in the open project (path and class; for Blueprints also the parent class), from the editor's asset registry. Read-only. Use this instead of guessing from .uasset file names.",
         "inputSchema": {
             "type": "object",
             "properties": {
                 "path": {"type": "string", "description": "Content path to search, recursively. Default /Game (the Content folder)."},
                 "class_name": {"type": "string", "description": "Only this asset class, for example Blueprint, StaticMesh, Material, World."},
+                "parent_class": {"type": "string", "description": "Only Blueprints whose parent class or nearest C++ base class has this name, for example GMATestbedCharacter. Use it to find the Blueprints built on a C++ class before changing that class."},
                 "limit": {"type": "integer", "description": "Maximum rows to return. Default 200."},
             },
         },
@@ -367,6 +676,67 @@ TOOLS = [
         },
         "annotations": {"readOnlyHint": True},
         "handler": tool_get_properties,
+    },
+    {
+        "name": "unreal_read_blueprint",
+        "description": (
+            "Read a Blueprint's logic as text: parent class (and whether it is this project's C++), components, "
+            "variables with defaults, and every graph (Event Graph, functions, Construction Script, Anim Graph) as "
+            "indented steps with the values wired into each node. Marks what comes from C++, such as events declared "
+            "in C++ and C++ functions it calls. Works for Actor, Widget and Anim Blueprints. Read-only."
+        ),
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "asset_path": {"type": "string", "description": "Blueprint asset path, for example /Game/Blueprints/BP_Coin."},
+                "graph": {"type": "string", "description": "Only this graph, for example EventGraph or a function name. Use it when the whole Blueprint is too long."},
+            },
+            "required": ["asset_path"],
+        },
+        "annotations": {"readOnlyHint": True},
+        "handler": tool_read_blueprint,
+    },
+    {
+        "name": "unreal_read_log",
+        "description": (
+            "Read the Unreal Editor's Output Log (Saved/Logs/<Project>.log): errors and warnings by default, repeats "
+            "folded, newest last, with counts by category. Use it after a Play In Editor test, a Blueprint compile or a "
+            "crash, to see what went wrong; UE_LOG and Print String messages are there too (level all). Works even when "
+            "the editor is closed (then it is the last session's log). Read-only."
+        ),
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "level": {"type": "string", "enum": ["error", "warning", "all"], "description": "error: errors only. warning (default): errors and warnings. all: every message, including UE_LOG and Print String output."},
+                "since_play": {"type": "boolean", "description": "Only messages since the last Play In Editor start. Use it after the user (or you) tested the game."},
+                "contains": {"type": "string", "description": "Only messages containing this text (not case-sensitive), for example a class or asset name."},
+                "category": {"type": "string", "description": "Only this log category, for example LogBlueprint, LogTemp or LogScript (partial names match)."},
+                "limit": {"type": "integer", "description": "Maximum entries to show, newest kept. Default 100."},
+                "include_noise": {"type": "boolean", "description": "Also show engine network and cache messages (LogHttp and similar), hidden by default."},
+            },
+        },
+        "annotations": {"readOnlyHint": True},
+        "handler": tool_read_log,
+    },
+    {
+        "name": "unreal_take_screenshot",
+        "description": (
+            "Take a picture and return it as an image: the level as seen from the editor camera (without editor icons), "
+            "or the game view with its on-screen UI while Play In Editor is running. Use it to see what the level looks "
+            "like after a change (placed actors, lighting, materials) or what the player sees. With actor_label the "
+            "picture is taken looking at that actor; the user's own camera doesn't move. Works with the editor in the "
+            "background. Nothing is saved to the project. Read-only."
+        ),
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "actor_label": {"type": "string", "description": "Take the picture looking at this actor in the open level (as unreal_list_level_actors shows it). Ignored during Play In Editor."},
+                "width": {"type": "integer", "description": "Image width in pixels, 320 to 1920. Default 1280."},
+                "height": {"type": "integer", "description": "Image height in pixels, 180 to 1080. Default 720."},
+            },
+        },
+        "annotations": {"readOnlyHint": True},
+        "handler": tool_take_screenshot,
     },
     {
         "name": "unreal_run_python",
@@ -420,7 +790,9 @@ def _handle(request):
             ok, text = tool["handler"](params.get("arguments") or {})
         except Exception as error:
             ok, text = False, "Bridge error: {0}".format(error)
-        return {"content": [{"type": "text", "text": text}], "isError": not ok}
+        # Handlers return text, or a list of MCP content items (text and images).
+        content = text if isinstance(text, list) else [{"type": "text", "text": text}]
+        return {"content": content, "isError": not ok}
     raise LookupError("Method not found: {0}".format(method))
 
 
