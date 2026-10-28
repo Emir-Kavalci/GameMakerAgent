@@ -22,7 +22,7 @@ import blueprint_text  # noqa: E402
 import editor_log  # noqa: E402
 
 SERVER_NAME = "game-maker-agent-unreal"
-SERVER_VERSION = "0.5.1"
+SERVER_VERSION = "0.6.0"
 SUPPORTED_PROTOCOLS = ["2025-06-18", "2025-03-26", "2024-11-05"]
 
 # MCP messages go to the real stdout; anything else printed by accident goes to stderr.

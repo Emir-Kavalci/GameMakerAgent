@@ -4,7 +4,7 @@ All notable changes to GameMakerAgent are listed here. Versions follow [Semantic
 
 To update an installed copy, run `/plugin marketplace update game-maker-agent` in Claude Code, then `/plugin update game-maker-agent@game-maker-agent`, and restart Claude Code.
 
-## [Unreleased]
+## [0.6.0] - 2026-10-29
 
 ### Added
 - `unreal_read_blueprint`: reads a Blueprint (Actor, Widget or Anim Blueprint) as text: parent class, components, variables with defaults, and every graph as indented steps with the values wired into each node. It marks events declared in C++ and C++ functions the Blueprint calls. The editor exports the Blueprint as T3D text and the bridge turns it into steps, so nothing extra is installed.
