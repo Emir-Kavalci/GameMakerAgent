@@ -6,6 +6,10 @@ A real game studio has programmers, designers, artists, QA testers and producers
 
 > **Status: early preview (v0.6.0).** Built for Unreal Engine 5.7 on Windows. The core feature workflow (designer, programmer, QA, producer) has been tested end to end on a real Unreal Engine 5.7 C++ project, and every agent has automated behavior tests (see [TESTING.md](TESTING.md)). Expect rough edges.
 
+![Sky Climb: a side-view climb up a grey-box tower, away from rising lava, ending on "YOU MADE IT!"](docs/images/sky-climb-demo.gif)
+
+*Sky Climb, a small game made with these agents on a fresh Unreal Engine 5.7 C++ Third Person project. The game designer picked the idea with the developer and wrote five feature specs, the programmer wrote the C++ and built the tower through the editor connection, QA reviewed every step, the producer kept the task list, and the art director and technical artist did the visual pass. Grey boxes only; no new art.*
+
 ## What's included
 
 ### Agents

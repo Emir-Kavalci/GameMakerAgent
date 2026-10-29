@@ -4,6 +4,11 @@ All notable changes to GameMakerAgent are listed here. Versions follow [Semantic
 
 To update an installed copy, run `/plugin marketplace update game-maker-agent` in Claude Code, then `/plugin update game-maker-agent@game-maker-agent`, and restart Claude Code.
 
+## [Unreleased]
+
+### Added
+- Demo GIF in the README: Sky Climb, a small game built with the agents on a fresh Unreal Engine 5.7 project.
+
 ## [0.6.0] - 2026-10-29
 
 ### Added
