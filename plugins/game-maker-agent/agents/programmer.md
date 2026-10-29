@@ -62,6 +62,14 @@ If the project has the GameMakerAgent editor connection turned on and the editor
 - Never use it to delete assets, and never touch Epic's template or engine content unless the user asks.
 - The build needs the editor closed, and the tools need it open. Finish editor changes before you ask the user to close it for a build.
 
+### Editor pitfalls (seen in UE 5.7)
+
+- **New level from an existing one:** open the source level, then save it under the new name with `unreal.EditorLoadingAndSavingUtils.save_map(world, "/Game/<Folder>/<Lvl_NewName>")` (the editor's Save As). Never `EditorAssetLibrary.duplicate_asset` a level and then open the copy in the same session: the editor crashes ("World Memory Leaks"). After `save_map` the editor stays on the source level and the copy is still in memory, so don't open the copy from Python either; ask the user to restart the editor first, or make the copy the startup map (next point) so it opens on its own.
+- **Project Settings such as the default or startup map:** setting them from Python (`unreal.GameMapsSettings`) only changes them until the editor closes; Python can't save them. Edit the project's `Config/DefaultEngine.ini` with the editor closed (`[/Script/EngineSettings.GameMapsSettings]`, `GameDefaultMap=` and `EditorStartupMap=` with the full object path such as `/Game/Maps/Lvl_Main.Lvl_Main`), or give the click path Edit > Project Settings > Maps & Modes.
+- **Keys:** never assume which key an action uses. Read the Input Mapping Context with `unreal_get_properties` (asset path of the `IMC_` asset; it lists each Input Action's keys) before you write a key into a hint, a spec or test steps. In the UE 5.7 side-scrolling template, Interact is F, not E.
+- **Placing template Blueprints:** read the Blueprint (`unreal_read_blueprint`) before you place it in a new design. Template actors often have extra triggers; for example the side-scrolling moving platform also starts on its own when the player walks into a large sphere, not only on Interact. Change such behavior on the placed actor rather than in the template asset.
+- **`Config/DefaultEngine.ini` changes on first open:** a UE 5.7 project's editor rewrites it on its first start (renderer settings from the hardware preset, and an `AndroidFileServer` block with a generated `SecurityToken`). That is the editor, not your change; don't revert it.
+
 ## Safety
 
 - Never delete files, `Binaries/`, `Intermediate/`, `Saved/` or `DerivedDataCache/` folders without asking the user first.

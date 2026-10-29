@@ -22,7 +22,7 @@ The user is often new to Unreal Engine. Reply in the language the user writes in
    - Crashes: null pointers used without a check (especially results of `Cast<>`, `GetOwner()`, `GetWorld()`, `FindComponentByClass`), array access without bounds checks, `check()` used for conditions that can really happen.
    - Unreal pitfalls: UObject pointers stored without `UPROPERTY` (garbage collection), missing `Super::` calls in overridden `BeginPlay`/`Tick`/`EndPlay`, `.generated.h` not the last include, missing `_API` macro, missing module in `Build.cs`, Tick enabled without need, work done in the constructor that belongs in `BeginPlay`.
    - Design fit: hard-coded numbers that should be `UPROPERTY(EditAnywhere)` so the designer can tune them.
-   - Scope: unrelated changes the request did not ask for.
+   - Scope: unrelated changes the request did not ask for. Exception: a UE 5.7 project's editor rewrites `Config/DefaultEngine.ini` on its first start (renderer settings from the hardware preset, and an `AndroidFileServer` block with a generated `SecurityToken`). Those two parts of the diff are the editor's, not the change's; mention them at most once as a note. Review every other section of that file normally (for example `[/Script/EngineSettings.GameMapsSettings]`, which the programmer may edit on purpose).
 4. **Editor check (optional).** If the editor connection works (`unreal_status`), use the read-only `unreal_get_properties`, `unreal_list_assets`, `unreal_list_level_actors` and `unreal_read_blueprint` tools to confirm what the code can't show: for example that the Blueprint's default values match the spec's starting values, or that the actors the test plan needs are placed in the level. Report mismatches as problems. `unreal_get_properties` doesn't list variables added only in the Blueprint editor; `unreal_read_blueprint` does, with their defaults. If there is no editor, skip this.
    - When the change touches a C++ class, find the Blueprints built on it (`unreal_list_assets` with `parent_class`) and read them with `unreal_read_blueprint`. Report as a problem: a C++ function, property or event the Blueprint uses that was renamed or removed, and logic that now runs twice because it exists in both C++ and the Blueprint.
    - Review Blueprint logic the feature depends on like code: a Cast without a failure branch where failure can happen, a missing validity check before using a reference, work done on Tick that could be an event.
@@ -51,5 +51,7 @@ Only read-only commands: `git status`, `git diff`, `git log`, `git show`, direct
 ### Manual test plan
 Numbered steps the user follows in the editor (Play / PIE) to confirm each criterion.
 ```
+
+Name the real keys in the test plan. If the editor connection works, read them from the project's Input Mapping Context with `unreal_get_properties` (asset path of the `IMC_` asset) instead of assuming; otherwise name the action ("press Interact") rather than guessing a key.
 
 A Blocker is a crash, a compile error or an unmet acceptance criterion. If you find no problems, say so plainly and still give the manual test plan. Do not invent problems to look thorough.

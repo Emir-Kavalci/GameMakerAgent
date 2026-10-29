@@ -4,10 +4,19 @@ All notable changes to GameMakerAgent are listed here. Versions follow [Semantic
 
 To update an installed copy, run `/plugin marketplace update game-maker-agent` in Claude Code, then `/plugin update game-maker-agent@game-maker-agent`, and restart Claude Code.
 
-## [Unreleased]
+## [0.7.0] - 2026-10-29
 
 ### Added
 - Demo GIF in the README: Sky Climb, a small game built with the agents on a fresh Unreal Engine 5.7 project.
+- `unreal_get_properties` lists the keys of each Input Action when given an Input Mapping Context (`IMC_` asset), so agents can read which key does what without running a script.
+- `programmer` and `technical-artist` know editor pitfalls found while building Sky Climb: copying a level with `duplicate_asset` and opening the copy crashes the editor (use Save As with `save_map`); Project Settings such as the startup map can't be saved from Python (edit `Config/DefaultEngine.ini` with the editor closed); template Blueprints can have hidden triggers.
+- `programmer`, `game-designer` and `qa` read keys from the Input Mapping Context instead of assuming them in hints, specs and test plans.
+- `art-director` judges shadows and brightness from a picture taken during play, since editor-camera screenshots leave out the Sky Light.
+- `qa` doesn't report the editor's own first-start rewrite of `Config/DefaultEngine.ini` (renderer settings, `AndroidFileServer` block) as an unrelated change, but still reviews the rest of that file.
+
+### Fixed
+- `unreal_read_log` with `since_play`: a level load during play (OpenLevel, a restart key) no longer counts as a new Play In Editor start, so the whole play session is shown, and the answer says how many level loads it includes.
+- `unreal_take_screenshot` now says that editor-camera pictures leave out the Sky Light and ignore automatic exposure limits, so agents judge shadows and brightness from a picture taken during play or ask the user.
 
 ## [0.6.0] - 2026-10-29
 

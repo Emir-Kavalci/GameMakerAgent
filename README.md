@@ -4,7 +4,7 @@ A team of [Claude Code](https://code.claude.com) agents for people who make game
 
 A real game studio has programmers, designers, artists, QA testers and producers. A solo developer has to be all of them. GameMakerAgent gives Claude Code one agent per game-development role, so you can hand each kind of work to a specialist.
 
-> **Status: early preview (v0.6.0).** Built for Unreal Engine 5.7 on Windows. The core feature workflow (designer, programmer, QA, producer) has been tested end to end on a real Unreal Engine 5.7 C++ project, and every agent has automated behavior tests (see [TESTING.md](TESTING.md)). Expect rough edges.
+> **Status: early preview (v0.7.0).** Built for Unreal Engine 5.7 on Windows. The core feature workflow (designer, programmer, QA, producer) has been tested end to end on a real Unreal Engine 5.7 C++ project, and every agent has automated behavior tests (see [TESTING.md](TESTING.md)). Expect rough edges.
 
 ![Sky Climb: a side-view climb up a grey-box tower, away from rising lava, ending on "YOU MADE IT!"](docs/images/sky-climb-demo.gif)
 

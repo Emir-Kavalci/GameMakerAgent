@@ -22,7 +22,7 @@ import blueprint_text  # noqa: E402
 import editor_log  # noqa: E402
 
 SERVER_NAME = "game-maker-agent-unreal"
-SERVER_VERSION = "0.6.0"
+SERVER_VERSION = "0.7.0"
 SUPPORTED_PROTOCOLS = ["2025-06-18", "2025-03-26", "2024-11-05"]
 
 # MCP messages go to the real stdout; anything else printed by accident goes to stderr.
@@ -373,7 +373,23 @@ def tool_get_properties(args):
         "            hidden[name] = read(name)\n"
         "        except Exception:\n"
         "            continue\n"
-        "    _out({{'kind': kind, 'own': own, 'engine': engine, 'hidden': hidden}})\n"
+        "    # an Input Mapping Context's keys, readable (UE 5.7 keeps them in default_key_mappings, older versions in mappings)\n"
+        "    keys = {{}}\n"
+        "    if isinstance(obj, unreal.InputMappingContext):\n"
+        "        try:\n"
+        "            found = list(obj.get_editor_property('default_key_mappings').get_editor_property('mappings'))\n"
+        "        except Exception:\n"
+        "            found = []\n"
+        "        if not found:\n"
+        "            try:\n"
+        "                found = list(obj.get_editor_property('mappings'))\n"
+        "            except Exception:\n"
+        "                found = []\n"
+        "        for mapping in found:\n"
+        "            action = mapping.get_editor_property('action')\n"
+        "            name = action.get_name() if action else '(no action)'\n"
+        "            keys.setdefault(name, []).append(str(mapping.get_editor_property('key').get_editor_property('key_name')))\n"
+        "    _out({{'kind': kind, 'own': own, 'engine': engine, 'hidden': hidden, 'keys': keys}})\n"
     ).format(asset=asset, cpp_names=_cpp_property_names(_project_dir()))
     ok, data = _query_editor(code)
     if not ok:
@@ -381,6 +397,9 @@ def tool_get_properties(args):
     if "error" in data:
         return False, data["error"]
     lines = ["{0} ({1})".format(asset, data["kind"])]
+    if data.get("keys"):
+        lines.append("Key mappings (Input Action: keys):")
+        lines += ["- {0}: {1}".format(action, ", ".join(keys)) for action, keys in data["keys"].items()]
     lines.append("Project properties ({0}):".format(len(data["own"])))
     lines += ["- {0} = {1}".format(k, v) for k, v in sorted(data["own"].items())] or ["- (none)"]
     if data.get("hidden"):
@@ -612,9 +631,9 @@ def tool_take_screenshot(args):
     if data.get("pie"):
         what = "the game view (Play In Editor is running), with its on-screen UI" + ("; actor_label is ignored while playing" if label else "")
     elif label:
-        what = "the level, looking at {0} (it is in the middle of the picture, possibly hidden by other objects); editor icons are not shown and lighting can look a little darker than in the viewport".format(label)
+        what = "the level, looking at {0} (it is in the middle of the picture, possibly hidden by other objects); editor icons are not shown, and without the Sky Light and automatic exposure, faces in shadow look black and brightness can differ from the game: judge those from a picture taken during Play In Editor or ask the user".format(label)
     else:
-        what = "the level from the editor camera; editor icons are not shown and lighting can look a little darker than in the viewport"
+        what = "the level from the editor camera; editor icons are not shown, and without the Sky Light and automatic exposure, faces in shadow look black and brightness can differ from the game: judge those from a picture taken during Play In Editor or ask the user"
     caption = "{0}x{1} picture of {2}.".format(width, height, what)
     return True, [{"type": "text", "text": caption}, {"type": "image", "data": image, "mimeType": "image/png"}]
 
@@ -665,7 +684,7 @@ TOOLS = [
     },
     {
         "name": "unreal_get_properties",
-        "description": "Show the editable properties of an asset (for a Blueprint, its class defaults) or of one actor placed in the open level, which can override the defaults. Give either asset_path or actor_label. Read-only.",
+        "description": "Show the editable properties of an asset (for a Blueprint, its class defaults) or of one actor placed in the open level, which can override the defaults. For an Input Mapping Context (IMC_) it lists which keys each Input Action uses. Give either asset_path or actor_label. Read-only.",
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -708,7 +727,7 @@ TOOLS = [
             "type": "object",
             "properties": {
                 "level": {"type": "string", "enum": ["error", "warning", "all"], "description": "error: errors only. warning (default): errors and warnings. all: every message, including UE_LOG and Print String output."},
-                "since_play": {"type": "boolean", "description": "Only messages since the last Play In Editor start. Use it after the user (or you) tested the game."},
+                "since_play": {"type": "boolean", "description": "Only messages since the last Play In Editor start, including levels the game loaded or restarted during that play session. Use it after the user (or you) tested the game."},
                 "contains": {"type": "string", "description": "Only messages containing this text (not case-sensitive), for example a class or asset name."},
                 "category": {"type": "string", "description": "Only this log category, for example LogBlueprint, LogTemp or LogScript (partial names match)."},
                 "limit": {"type": "integer", "description": "Maximum entries to show, newest kept. Default 100."},
@@ -725,7 +744,9 @@ TOOLS = [
             "or the game view with its on-screen UI while Play In Editor is running. Use it to see what the level looks "
             "like after a change (placed actors, lighting, materials) or what the player sees. With actor_label the "
             "picture is taken looking at that actor; the user's own camera doesn't move. Works with the editor in the "
-            "background. Nothing is saved to the project. Read-only."
+            "background. Nothing is saved to the project. Read-only. Editor-camera pictures don't include the Sky Light "
+            "and ignore automatic exposure limits, so faces in shadow look black and brightness can differ from the "
+            "viewport; judge shadow darkness and exposure from a picture taken during Play In Editor or ask the user."
         ),
         "inputSchema": {
             "type": "object",

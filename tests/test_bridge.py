@@ -35,7 +35,8 @@ def converse(requests):
 
 
 # A log with engine noise, a repeated warning, a call stack line, and a Play In Editor
-# run whose Blueprint compile error is written in the same frame as the PIE start.
+# run whose Blueprint compile error is written in the same frame as the PIE start; the
+# game then reloads its level (OpenLevel), which writes the PIE start line again.
 LOG = """﻿Log file open, 10/28/26 20:00:00
 LogInit: Display: Engine is initialized.
 [2026.10.28-20.00.01:000][  1]LogHttp: Warning: request failed, libcurl error: 35
@@ -47,6 +48,10 @@ LogInit: Display: Engine is initialized.
 [2026.10.28-20.00.05:000][ 61]LogScript: Warning: Accessed None trying to read property Coin
 	BP_Coin_C /Game/UEDPIE_0_Lvl_Main.Lvl_Main:PersistentLevel.BP_Coin_C_1
 [2026.10.28-20.00.06:000][ 62]LogTemp: Score is 3
+[2026.10.28-20.00.07:000][ 70]LogGlobalStatus: UEngine::Browse Started Browse: "/Game/Lvl_Main"
+[2026.10.28-20.00.07:000][ 70]LogNet: Browse: /Game/Lvl_Main
+[2026.10.28-20.00.07:000][ 70]LogPlayLevel: Creating play world package: /Game/UEDPIE_0_Lvl_Main
+[2026.10.28-20.00.08:000][ 80]LogTemp: Warning: After the level reload
 """
 
 HEADER = """
@@ -84,6 +89,7 @@ def unit_checks():
         ("log: repeated warnings fold into one with a count", everything.count("Accessed None") == 1 and "(x2)" in everything),
         ("log: call stack lines stay with their entry", "BP_Coin_C_1" in everything),
         ("log: since_play starts with the compile in the PIE start frame", "invalid target" in played and "Old warning" not in played),
+        ("log: a level reload during play doesn't restart since_play", "Accessed None" in played and "After the level reload" in played and "1 level load(s)" in played),
         ("log: level all includes plain messages", "Score is 3" in played and "Score is 3" not in everything),
         ("log: level error keeps only errors", "invalid target" in errors and "Accessed None" not in errors),
         ("C++ headers: UPROPERTY names are found", unreal_bridge._uproperty_names(HEADER) == ["CoinValue", "Mesh", "bSpins", "Offsets", "Counts"]),

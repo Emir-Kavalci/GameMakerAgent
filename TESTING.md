@@ -33,8 +33,9 @@ The bridge (`plugins/game-maker-agent/mcp/`) can only be fully tested against a 
 2. In a terminal in that project folder, start Claude Code with your working copy: `claude --plugin-dir <repo>/plugins/game-maker-agent`.
 3. Ask: "Is the Unreal Editor connected?", then "List the Blueprints in my project", "What are the default values of <a Blueprint>?" and "List the actors in the open level".
    Then "Read <a Blueprint> and explain its logic": open the same Blueprint in the editor and check that the steps, branches and values match the graph. Try an Actor, a Widget and an Anim Blueprint, and one whose parent class is your C++.
-   Then "Show me the level" and "Take a screenshot of <an actor in the level>" (your camera and selection must not change), with the editor behind other windows, and "Are there errors in the Output Log?". Press Play, walk around, stop, and ask "What did the log say while I played?".
+   Then "Show me the level" and "Take a screenshot of <an actor in the level>" (your camera and selection must not change), with the editor behind other windows, and "Are there errors in the Output Log?". Press Play, walk around, stop, and ask "What did the log say while I played?". If your game can reload its level during play (a restart key, OpenLevel), reload once before you stop: the answer must still cover the whole play session and mention the level load.
    Then "What are the values of <a Blueprint built on your C++ class>?": protected C++ properties must be listed under their C++ names.
+   Then "Which key is Interact?" (or another action): the answer must come from the project's Input Mapping Context, listed with its keys.
 4. Ask for a small change (for example "set <Blueprint>'s <value> to 2"). Claude Code must show you the script and wait for your OK before it runs. Afterwards ask Claude to set it back, or close the editor without saving.
 
 The eval suite can't cover the bridge, because eval runs have no editor.
