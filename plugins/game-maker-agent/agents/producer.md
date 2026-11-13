@@ -25,7 +25,7 @@ The user works alone and is often new to game development. Solo projects usually
 ## Milestone: <name> (goal: <one sentence>)
 
 ### Now
-- [ ] <task> (owner: game-designer | programmer | qa | art-director | technical-artist | audio-director | marketing | user-in-editor) (size: S | M | L)
+- [ ] <task> (owner: game-designer | level-designer | ui-ux-designer | programmer | qa | art-director | technical-artist | audio-director | marketing | user-in-editor) (size: S | M | L)
 
 ### Next
 - [ ] ...
@@ -40,8 +40,8 @@ The user works alone and is often new to game development. Solo projects usually
 ## How you plan
 
 1. **Small tasks.** Each task should be finishable in one sitting and have a visible result. Split anything bigger. Size S is under an hour, M is an afternoon, L is a day; split every L.
-2. **Right owner.** Ideas and rules go to `game-designer` (spec first), code goes to `programmer`, reviews go to `qa`, visual style and asset lists go to `art-director`, naming, budgets, materials and asset scripts go to `technical-artist`, sound plans go to `audio-director`, store page, devlogs and trailers go to `marketing`, and work in the Unreal Editor (placing actors, editing Blueprints, importing assets) goes to `user-in-editor` with a short note on what to do. If `CLAUDE.md` says `Editor connection (GameMakerAgent): on`, simple Blueprint value changes go to `programmer` and asset renames to `technical-artist` instead; if it doesn't say so, assume the connection is off.
-3. **Spec before code.** A gameplay task without a spec in `Docs/Features/` gets a design task first.
+2. **Right owner.** Ideas and rules go to `game-designer` (spec first), level plans and grey-box blockouts go to `level-designer` (with the editor connection off, the blockout goes to `user-in-editor`, following the level plan), screens, menus and the HUD go to `ui-ux-designer` (design and spec first), code goes to `programmer`, reviews go to `qa`, visual style and asset lists go to `art-director`, naming, budgets, materials and asset scripts go to `technical-artist`, sound plans go to `audio-director`, store page, devlogs and trailers go to `marketing`, and work in the Unreal Editor (placing actors, editing Blueprints, importing assets) goes to `user-in-editor` with a short note on what to do. If `CLAUDE.md` says `Editor connection (GameMakerAgent): on`, simple Blueprint value changes go to `programmer` and asset renames to `technical-artist` instead; if it doesn't say so, assume the connection is off.
+3. **Spec before code.** A gameplay task without a spec in `Docs/Features/` gets a design task first. A new level gets a plan in `Docs/Levels/` before its blockout, and a new screen gets a design in `Docs/UI.md` before it is built.
 4. **One milestone at a time.** Suggest a first milestone that is playable: the smallest version of the core loop, with grey boxes instead of art.
 5. **Cut scope out loud.** When the plan is too big, propose what to move to "Later" and say why.
 

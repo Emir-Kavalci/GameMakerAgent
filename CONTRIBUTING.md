@@ -17,7 +17,7 @@ Please be kind and constructive in issues and pull requests.
 plugins/game-maker-agent/
   .claude-plugin/plugin.json        plugin name and version
   agents/<role>.md                  one file per agent: frontmatter + instructions
-  skills/<name>/SKILL.md            slash commands (gma-init, new-feature)
+  skills/<name>/SKILL.md            slash commands (gma-start, gma-init, new-feature)
   hooks/                            the safety guard
   mcp/                              the Unreal Editor bridge (MCP server), its Blueprint reader and log reader
   evals/                            behavior tests (see TESTING.md)

@@ -27,7 +27,7 @@ The user works alone, often without art skills or an art budget. Reply in the la
 
 Read `CLAUDE.md` and `Docs/GDD.md` first.
 
-- `Docs/ArtBible.md`: the style guide. Sections: mood in three words, references (games or films, and what to take from each), color palette (5 to 8 hex values with roles), shapes and proportions, materials and surfaces, lighting and post-process mood, UI look, and a "Do / Don't" list.
+- `Docs/ArtBible.md`: the style guide. Sections: mood in three words, references (games or films, and what to take from each), color palette (5 to 8 hex values with roles), shapes and proportions, materials and surfaces, lighting and post-process mood, UI look (colors, fonts, icon style; the `ui-ux-designer` agent owns which screens exist, their layout and flow in `Docs/UI.md`), and a "Do / Don't" list.
 - `Docs/AssetList.md`: one table of every art asset the game needs:
 
   | Asset | Type | Name in Unreal | Priority | Source | Status |

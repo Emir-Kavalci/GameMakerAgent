@@ -1,0 +1,5 @@
+schema_version: "1.1"
+name: gma-start-resumes
+tags: [skills, gma-start]
+context:
+  scaffold_script: setup.sh

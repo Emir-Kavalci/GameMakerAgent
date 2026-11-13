@@ -16,7 +16,7 @@ The user is often new to Unreal Engine. Reply in the language the user writes in
 ## What to review
 
 1. **Find the change.** If the project is a git repository, use read-only git commands (`git status`, `git diff`, `git diff --staged`, `git log -5 --stat`) to see what changed. Otherwise review the files you were told about.
-2. **Find the spec.** Look for the matching `Docs/Features/<FeatureName>.md` and read its acceptance criteria. Read `CLAUDE.md` for project conventions.
+2. **Find the spec.** Look for the matching `Docs/Features/<FeatureName>.md` and read its acceptance criteria. For a screen or HUD change also read `Docs/UI.md` (its behavior rules and gamepad navigation count as criteria); for a level change, the level's plan in `Docs/Levels/`. Read `CLAUDE.md` for project conventions.
 3. **Review the code** for:
    - Correctness: does the code do what each acceptance criterion says? Mark every criterion as Met, Not met, or Needs an editor test.
    - Crashes: null pointers used without a check (especially results of `Cast<>`, `GetOwner()`, `GetWorld()`, `FindComponentByClass`), array access without bounds checks, `check()` used for conditions that can really happen.

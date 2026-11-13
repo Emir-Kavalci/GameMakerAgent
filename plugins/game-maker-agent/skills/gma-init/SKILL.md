@@ -51,6 +51,7 @@ Templates for this skill are in `${CLAUDE_SKILL_DIR}/templates/`.
 
    ## Team workflow (GameMakerAgent)
    - game-designer writes a spec in Docs/Features/ before a feature is built.
+   - level-designer plans levels in Docs/Levels/ and builds grey-box blockouts; ui-ux-designer designs screens, menus and the HUD in Docs/UI.md.
    - programmer builds it; work is done only when it compiles.
    - qa reviews the change against the spec's acceptance criteria.
    - producer keeps Docs/Tasks.md up to date.
@@ -76,7 +77,7 @@ Templates for this skill are in `${CLAUDE_SKILL_DIR}/templates/`.
 5. **Create the design documents** from the templates:
    - `Docs/GDD.md` from `templates/GDD.md`. Replace `<Game title>` with the project name, and fill in the pitch from the user's description if there is one.
    - `Docs/Tasks.md` from `templates/Tasks.md`.
-   - An empty `Docs/Features/` folder (create a `Docs/Features/README.md` with one line: "One spec per feature, written by the game-designer agent.").
+   - An empty `Docs/Features/` folder (create a `Docs/Features/README.md` with one line: "One spec per feature, written by the game-designer agent (by the ui-ux-designer agent for screens).").
 
 6. **Version control files.** Check whether the folder is a git repository (`git rev-parse --is-inside-work-tree`).
    - Explain in one sentence what each file does, then offer to create `.gitignore` from `templates/gitignore.txt` and `.gitattributes` from `templates/gitattributes.txt`. Create them only after the user agrees.
@@ -99,3 +100,4 @@ Templates for this skill are in `${CLAUDE_SKILL_DIR}/templates/`.
    - "Use the game-designer agent to design a sprint ability."
    - "/game-maker-agent:new-feature sprint ability"
    - "Use the producer agent to plan my first playable milestone."
+   If `Docs/GettingStarted.md` exists, the user came from the getting-started guide: instead of the three examples, tell them to type `/game-maker-agent:gma-start` to continue it.

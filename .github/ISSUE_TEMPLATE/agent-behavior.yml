@@ -12,6 +12,8 @@ body:
       label: Which agent or skill?
       options:
         - game-designer
+        - level-designer
+        - ui-ux-designer
         - programmer
         - qa
         - producer
@@ -19,6 +21,7 @@ body:
         - technical-artist
         - audio-director
         - marketing
+        - /game-maker-agent:gma-start
         - /game-maker-agent:gma-init
         - /game-maker-agent:new-feature
         - Safety guard (hook)

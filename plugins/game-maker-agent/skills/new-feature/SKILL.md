@@ -19,7 +19,7 @@ Make sure the current folder contains a `*.uproject` file. If `CLAUDE.md` or `Do
 
 ## Step 1: Spec (game-designer)
 
-Ask the `game-maker-agent:game-designer` agent to write `Docs/Features/<FeatureName>.md` for this idea, using `Docs/GDD.md` for context. If a spec for this feature already exists, have it review and update that one instead.
+Ask the `game-maker-agent:game-designer` agent to write `Docs/Features/<FeatureName>.md` for this idea, using `Docs/GDD.md` for context. If a spec for this feature already exists, have it review and update that one instead. If the feature is a screen, menu or HUD, ask the `game-maker-agent:ui-ux-designer` agent instead; it writes the spec in the same format and adds the screen to `Docs/UI.md`.
 
 Show the user the spec's goal and acceptance criteria.
 
@@ -48,4 +48,4 @@ Ask the `game-maker-agent:qa` agent to review the change against the spec's acce
 
 Ask the `game-maker-agent:producer` agent to mark the feature as done in `Docs/Tasks.md` (adding it if it is missing) and to suggest the next task.
 
-Finish with a short summary: the spec file, the changed code files, the QA verdict, and the suggested next task. If the project is a git repository, suggest committing the work now, with a one-line commit message.
+Finish with a short summary: the spec file, the changed code files, the QA verdict, and the suggested next task. If the project is a git repository, suggest committing the work now, with a one-line commit message. If `Docs/GettingStarted.md` exists, also tell the user to type `/game-maker-agent:gma-start` to continue the getting-started guide.

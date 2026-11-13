@@ -83,7 +83,24 @@ def unit_checks():
     played = editor_log.report(LOG, since_pie=True, level="all")
     errors = editor_log.report(LOG, level="error")
     noisy = editor_log.report(LOG, include_noise=True)
+
+    # the editor-side script unreal_get_properties sends must be valid Python, with and without a component
+    scripts = []
+    real_query = unreal_bridge._query_editor
+    unreal_bridge._query_editor = lambda code: (scripts.append(code), (False, "no editor"))[1]
+    try:
+        unreal_bridge.tool_get_properties({"asset_path": "/Game/BP_Hero"})
+        unreal_bridge.tool_get_properties({"actor_label": "Hero", "component": "CharacterMovement"})
+    finally:
+        unreal_bridge._query_editor = real_query
+    try:
+        for code in scripts:
+            compile(code, "get_properties", "exec")
+        scripts_compile = len(scripts) == 2 and "comp_name = 'CharacterMovement'" in scripts[1]
+    except SyntaxError:
+        scripts_compile = False
     return [
+        ("get_properties: editor scripts compile, component is passed", scripts_compile),
         ("log: engine network noise is hidden and counted", "LogHttp: Warning" not in everything and "1 entries from" in everything),
         ("log: include_noise shows it", "libcurl error: 35" in noisy),
         ("log: repeated warnings fold into one with a count", everything.count("Accessed None") == 1 and "(x2)" in everything),

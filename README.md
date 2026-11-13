@@ -4,7 +4,7 @@ A team of [Claude Code](https://code.claude.com) agents for people who make game
 
 A real game studio has programmers, designers, artists, QA testers and producers. A solo developer has to be all of them. GameMakerAgent gives Claude Code one agent per game-development role, so you can hand each kind of work to a specialist.
 
-> **Status: early preview (v0.7.0).** Built for Unreal Engine 5.7 on Windows. The core feature workflow (designer, programmer, QA, producer) has been tested end to end on a real Unreal Engine 5.7 C++ project, and every agent has automated behavior tests (see [TESTING.md](TESTING.md)). Expect rough edges.
+> **Status: early preview (v0.8.0).** Built for Unreal Engine 5.7 on Windows. The core feature workflow (designer, programmer, QA, producer) has been tested end to end on a real Unreal Engine 5.7 C++ project, and every agent has automated behavior tests (see [TESTING.md](TESTING.md)). Expect rough edges.
 
 ![Sky Climb: a side-view climb up a grey-box tower, away from rising lava, ending on "YOU MADE IT!"](docs/images/sky-climb-demo.gif)
 
@@ -19,6 +19,8 @@ A real game studio has programmers, designers, artists, QA testers and producers
 | Agent | Role |
 | --- | --- |
 | `game-designer` | Shapes your idea, keeps the Game Design Document (`Docs/GDD.md`) and writes a spec with acceptance criteria for each feature. Doesn't write code. |
+| `level-designer` | Plans each level in `Docs/Levels/` with jump gaps and heights worked out from your character's real movement values, and (with your approval for each script) builds a grey-box blockout in the open editor. |
+| `ui-ux-designer` | Plans your screens and their flow in `Docs/UI.md` (menus, pause, HUD) with text wireframes, gamepad navigation and readability rules, then writes a spec the programmer can build. Doesn't write code. |
 | `programmer` | Writes and fixes Unreal Engine C++ gameplay code from the spec, explains compile errors, and follows your project's conventions. |
 | `qa` | Reviews code changes against the spec and common Unreal pitfalls, and writes a manual test plan. Read-only: it reports problems but never edits your files. |
 | `producer` | Breaks the game into small tasks in `Docs/Tasks.md`, assigns each to the right teammate, and helps you cut scope. |
@@ -40,12 +42,13 @@ The agent that writes code is never the one that reviews it.
 
 | Command | What it does |
 | --- | --- |
+| `/game-maker-agent:gma-start` | New to all this? A step-by-step guide: checks your computer (Unreal Engine, Visual Studio C++, Git), helps you create an Unreal project, guides you through setup, introduces the team and walks you through a first small feature. It remembers where you stopped (`Docs/GettingStarted.md`), so run it again to continue. |
 | `/game-maker-agent:gma-init` | Run once inside your Unreal project. Creates `CLAUDE.md`, `Docs/GDD.md`, `Docs/Tasks.md`, and (if you agree) Unreal-ready `.gitignore` and `.gitattributes` files and the Unreal Editor connection. |
 | `/game-maker-agent:new-feature <idea>` | Takes one feature from idea to reviewed code: spec → code → build (Claude runs it while you keep the editor closed) → QA review → your editor test → task list update. You approve every step. |
 
 ### Unreal Editor connection (optional, Windows)
 
-GameMakerAgent can connect to your open Unreal Editor. Then the agents can look at the real project instead of guessing: read a Blueprint's default values or one placed actor's values (including protected C++ properties), list assets with their real types, list the actors in the open level, read the Output Log after you play, and take a screenshot of the level or of the game while you play. With your approval for each script, they can also change things the safe way, through the editor (for example set a Blueprint value or rename assets without breaking references).
+GameMakerAgent can connect to your open Unreal Editor. Then the agents can look at the real project instead of guessing: read a Blueprint's default values or one placed actor's values (including protected C++ properties and the values inside a component such as Character Movement), list assets with their real types, list the actors in the open level, read the Output Log after you play, and take a screenshot of the level or of the game while you play. With your approval for each script, they can also change things the safe way, through the editor (for example set a Blueprint value or rename assets without breaking references).
 
 **Agents read your Blueprints, not only your C++.** `unreal_read_blueprint` turns a Blueprint (Actor, Widget or Anim Blueprint) into readable text: its parent class, components, variables with their defaults, and every graph as indented steps. It marks what comes from your C++, such as events declared in C++ and C++ functions the Blueprint calls. So before the `programmer` changes a C++ class, it reads the Blueprints built on it, and it won't break the nodes they use or write logic you already have in a Blueprint. Example output:
 
@@ -62,7 +65,7 @@ Event OnCollected [event declared in C++] (Collector: Actor)
 
 The connection reads Blueprint graphs but doesn't add or rewire nodes; for a Blueprint logic change the agent moves the logic to C++ (if you agree) or tells you which nodes to change.
 
-**Agents see what happened when you played.** After you test in the editor, `unreal_read_log` reads the Output Log since the last Play: errors such as "Accessed None", Blueprint errors and your own log lines, with repeats folded and engine network noise hidden. It reads the log file, so it also works after the editor has closed or crashed. `unreal_take_screenshot` gives the agent a picture of the level (or of the game view, with its UI, while you play), so `programmer`, `qa`, `technical-artist` and `art-director` can check how a change looks. It can look at one actor, and your own camera never moves. The editor only has to be open: it can stay behind other windows. The picture goes to the agent and is deleted right away; nothing is saved in your project.
+**Agents see what happened when you played.** After you test in the editor, `unreal_read_log` reads the Output Log since the last Play: errors such as "Accessed None", Blueprint errors and your own log lines, with repeats folded and engine network noise hidden. It reads the log file, so it also works after the editor has closed or crashed. `unreal_take_screenshot` gives the agent a picture of the level (or of the game view, with its UI, while you play), so `programmer`, `qa`, `technical-artist`, `art-director`, `level-designer` and `ui-ux-designer` can check how a change looks. It can look at one actor, and your own camera never moves. The editor only has to be open: it can stay behind other windows. The picture goes to the agent and is deleted right away; nothing is saved in your project.
 
 - **Turn it on:** run `/game-maker-agent:gma-init` and say yes to the editor connection. It enables Unreal's built-in Python Editor Script Plugin and its "Enable Remote Execution" setting. Or do it yourself: Edit > Plugins > "Python Editor Script Plugin", then Edit > Project Settings > Plugins > Python > "Enable Remote Execution?".
 - **Check it:** with the editor open, ask Claude *"Is the Unreal Editor connected?"*.
@@ -105,6 +108,8 @@ GameMakerAgent is free and open source. It has no paid tier, no API keys and no 
 The agents run inside Claude Code, so using them counts toward your own Claude plan's usage, the same as any other Claude Code conversation. The plugin adds no extra charge.
 
 ## Quick start
+
+Never used Unreal Engine or Claude Code for a game before? Start `claude` in your Unreal project folder, or in an empty folder if you don't have a project yet, and run `/game-maker-agent:gma-start`; it walks you through everything below, one step at a time.
 
 1. Open a terminal in your Unreal project folder (the one that contains the `.uproject` file) and start `claude`.
 2. Run `/game-maker-agent:gma-init` and answer its question about your game.

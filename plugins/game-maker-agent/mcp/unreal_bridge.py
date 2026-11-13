@@ -22,7 +22,7 @@ import blueprint_text  # noqa: E402
 import editor_log  # noqa: E402
 
 SERVER_NAME = "game-maker-agent-unreal"
-SERVER_VERSION = "0.7.0"
+SERVER_VERSION = "0.8.0"
 SUPPORTED_PROTOCOLS = ["2025-06-18", "2025-03-26", "2024-11-05"]
 
 # MCP messages go to the real stdout; anything else printed by accident goes to stderr.
@@ -320,6 +320,7 @@ def tool_get_properties(args):
     if not asset and not label:
         return False, "Give asset_path (for example /Game/Blueprints/BP_Coin) or actor_label (an actor's name in the level, for example BP_Coin2)."
     include_engine = bool(args.get("include_engine_properties"))
+    component = (args.get("component") or "").strip()
     if label:
         find = (
             "obj = None\n"
@@ -336,14 +337,41 @@ def tool_get_properties(args):
     # properties every Actor inherits from the engine only on request.
     code = _PRELUDE + find + (
         "import re\n"
-        "if obj is None:\n"
-        "    _out({{'error': missing}})\n"
-        "else:\n"
+        "target = None\n"
+        "comp_name = {component!r}\n"
+        "if obj is not None:\n"
         "    target = obj\n"
         "    kind = obj.get_class().get_name()\n"
         "    if isinstance(obj, unreal.Blueprint):\n"
         "        target = unreal.get_default_object(obj.generated_class())\n"
         "        kind = 'Blueprint class defaults of ' + target.get_class().get_name()\n"
+        "    if comp_name:\n"
+        "        # one component, by property name (CharacterMovement, CapsuleComponent) or object name\n"
+        "        snake = re.sub(r'(?<!^)(?=[A-Z])', '_', comp_name).lower()\n"
+        "        comp = None\n"
+        "        for cand in (comp_name, snake, snake + '_component'):\n"
+        "            try:\n"
+        "                value = target.get_editor_property(cand)\n"
+        "            except Exception:\n"
+        "                continue\n"
+        "            if isinstance(value, unreal.ActorComponent):\n"
+        "                comp = value\n"
+        "                break\n"
+        "        found_names = []\n"
+        "        if comp is None and isinstance(target, unreal.Actor):\n"
+        "            for c in target.get_components_by_class(unreal.ActorComponent):\n"
+        "                found_names.append(c.get_name())\n"
+        "                if comp is None and c.get_name().lower() in (comp_name.lower(), comp_name.lower() + 'component'):\n"
+        "                    comp = c\n"
+        "        if comp is None:\n"
+        "            missing = 'No component ' + repr(comp_name) + ' found' + (' (components: ' + ', '.join(found_names) + ')' if found_names else '') + '. Components added in the Blueprint editor are not on the class defaults: read them with unreal_read_blueprint, or use actor_label for a placed actor.'\n"
+        "            target = None\n"
+        "        else:\n"
+        "            target = comp\n"
+        "            kind = kind + ' > component ' + comp.get_name() + ' (' + comp.get_class().get_name() + ')'\n"
+        "if target is None:\n"
+        "    _out({{'error': missing}})\n"
+        "else:\n"
         "    engine_names = set()\n"
         "    for base in type(target).__mro__:\n"
         "        if hasattr(base, 'static_class') and not base.static_class().get_path_name().startswith('/Script/' + unreal.SystemLibrary.get_game_name() + '.'):\n"
@@ -390,7 +418,7 @@ def tool_get_properties(args):
         "            name = action.get_name() if action else '(no action)'\n"
         "            keys.setdefault(name, []).append(str(mapping.get_editor_property('key').get_editor_property('key_name')))\n"
         "    _out({{'kind': kind, 'own': own, 'engine': engine, 'hidden': hidden, 'keys': keys}})\n"
-    ).format(asset=asset, cpp_names=_cpp_property_names(_project_dir()))
+    ).format(asset=asset, component=component, cpp_names=_cpp_property_names(_project_dir()))
     ok, data = _query_editor(code)
     if not ok:
         return False, data
@@ -405,7 +433,7 @@ def tool_get_properties(args):
     if data.get("hidden"):
         lines.append("C++ properties Blueprints can't see (protected or without BlueprintReadOnly/ReadWrite; read and set them by this C++ name) ({0}):".format(len(data["hidden"])))
         lines += ["- {0} = {1}".format(k, v) for k, v in sorted(data["hidden"].items())]
-    if include_engine:
+    if include_engine or (component and not data["own"]):
         lines.append("Inherited engine properties ({0}):".format(len(data["engine"])))
         lines += ["- {0} = {1}".format(k, v) for k, v in sorted(data["engine"].items())]
     else:
@@ -684,13 +712,14 @@ TOOLS = [
     },
     {
         "name": "unreal_get_properties",
-        "description": "Show the editable properties of an asset (for a Blueprint, its class defaults) or of one actor placed in the open level, which can override the defaults. For an Input Mapping Context (IMC_) it lists which keys each Input Action uses. Give either asset_path or actor_label. Read-only.",
+        "description": "Show the editable properties of an asset (for a Blueprint, its class defaults) or of one actor placed in the open level, which can override the defaults. For an Input Mapping Context (IMC_) it lists which keys each Input Action uses. Give either asset_path or actor_label, and optionally component to look inside one component. Read-only.",
         "inputSchema": {
             "type": "object",
             "properties": {
                 "asset_path": {"type": "string", "description": "Asset path, for example /Game/Blueprints/BP_Coin. Shows the Blueprint's class defaults."},
                 "actor_label": {"type": "string", "description": "Instead of asset_path: the name of an actor placed in the open level (as unreal_list_level_actors shows it), to see the values set on that one actor."},
                 "include_engine_properties": {"type": "boolean", "description": "Also list the properties inherited from engine classes such as Actor. Default false."},
+                "component": {"type": "string", "description": "Optional: show one component of that Blueprint or actor instead, for example CharacterMovement (walk speed, jump velocity, gravity scale) or CapsuleComponent (radius, half-height). Components declared in C++ work on Blueprint defaults; components added in the Blueprint editor only on a placed actor (actor_label)."},
             },
         },
         "annotations": {"readOnlyHint": True},

@@ -51,6 +51,8 @@ The cases live in `plugins/game-maker-agent/evals/`, one folder per case. Each c
 | Case | What it proves |
 | --- | --- |
 | `designer-writes-spec` | game-designer writes a spec with testable acceptance criteria and no code |
+| `level-designer-plans-level` | level-designer writes a level plan from the character's real values (double jump), with sizes and a playtest checklist, and creates no level or code files |
+| `ui-ux-no-fake-options` | ui-ux-designer plans the menus in `Docs/UI.md` with gamepad navigation and leaves out multiplayer, which the game doesn't have |
 | `programmer-new-class` | programmer follows the project's module layout, `_API` macro and Unreal header rules |
 | `programmer-refuses-uasset` | `.uasset` files are never edited as text (agent rule; the safety hook itself is tested by `tests/test-guard.sh`) |
 | `qa-finds-bug-read-only` | qa finds a real crash bug against the spec and changes no files |
@@ -59,6 +61,8 @@ The cases live in `plugins/game-maker-agent/evals/`, one folder per case. Each c
 | `tech-artist-audit-read-only` | technical-artist finds badly named assets and changes nothing |
 | `art-director-no-images` | art-director says it can't make images and offers a brief instead |
 | `audio-director-no-audio` | audio-director says it can't make sound files and offers a brief instead |
+| `gma-start-resumes` | gma-start reads its progress file and continues at the first feature instead of repeating setup |
+| `gma-start-new-project` | gma-start in a fresh project saves its progress and sends the user to gma-init without doing setup itself |
 | `gma-init-sets-up-project` | gma-init writes CLAUDE.md with the right facts, the GDD and the task list |
 | `gma-init-outside-project` | gma-init stops when the folder isn't an Unreal project |
 

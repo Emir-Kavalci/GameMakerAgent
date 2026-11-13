@@ -4,6 +4,17 @@ All notable changes to GameMakerAgent are listed here. Versions follow [Semantic
 
 To update an installed copy, run `/plugin marketplace update game-maker-agent` in Claude Code, then `/plugin update game-maker-agent@game-maker-agent`, and restart Claude Code.
 
+## [0.8.0] - 2026-11-14
+
+### Added
+- `/game-maker-agent:gma-start`: a step-by-step getting-started guide for beginners. It checks the computer (Unreal Engine, Visual Studio C++, Git and Git LFS), walks through creating a C++ Third Person project, sends the user to `gma-init`, introduces the team, and builds a first small feature with `new-feature`. Progress is kept in `Docs/GettingStarted.md`, so running it again continues where the user stopped.
+- `level-designer` agent: plans levels in `Docs/Levels/<LevelName>.md` (goal, flow, layout with sizes in centimeters, checkpoints, playtest checklist). It works out jump gaps and heights from the player character's real movement values (read through the editor connection, or stated as assumptions), and with the user's approval for each script it builds a grey-box blockout in the open editor, in its own Outliner folders and undoable with Ctrl+Z.
+- `ui-ux-designer` agent: plans the game's screens and their flow in `Docs/UI.md` (text wireframes, gamepad navigation, behavior while a screen is open, readability rules) and writes a spec per screen in `Docs/Features/` for the programmer and QA. It only designs what the game has, and reviews the HUD from a screenshot taken during play.
+- `producer`, `game-designer`, `programmer`, `qa`, `art-director` and `gma-init` know the two new roles: who plans levels and screens, and where their documents are.
+- `unreal_get_properties` can show the values inside one component (`component`, for example `CharacterMovement` or `CapsuleComponent`), so agents read the real walk speed, jump velocity and capsule size.
+- `new-feature` sends screens, menus and HUD features to `ui-ux-designer` for the spec.
+- Eval cases `level-designer-plans-level`, `ui-ux-no-fake-options`, `gma-start-resumes` and `gma-start-new-project`.
+
 ## [0.7.0] - 2026-10-29
 
 ### Added
