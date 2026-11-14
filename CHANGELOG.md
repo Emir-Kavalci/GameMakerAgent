@@ -4,6 +4,11 @@ All notable changes to GameMakerAgent are listed here. Versions follow [Semantic
 
 To update an installed copy, run `/plugin marketplace update game-maker-agent` in Claude Code, then `/plugin update game-maker-agent@game-maker-agent`, and restart Claude Code.
 
+## [Unreleased]
+
+### Added
+- Turkish README (`README.tr.md`), linked from the top of the English README.
+
 ## [0.8.0] - 2026-11-14
 
 ### Added

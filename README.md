@@ -1,5 +1,7 @@
 # GameMakerAgent
 
+**English** | [Türkçe](README.tr.md)
+
 A team of [Claude Code](https://code.claude.com) agents for people who make games alone with **Unreal Engine 5**.
 
 A real game studio has programmers, designers, artists, QA testers and producers. A solo developer has to be all of them. GameMakerAgent gives Claude Code one agent per game-development role, so you can hand each kind of work to a specialist.
