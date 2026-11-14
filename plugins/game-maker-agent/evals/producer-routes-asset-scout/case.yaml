@@ -1,0 +1,5 @@
+schema_version: "1.1"
+name: producer-routes-asset-scout
+tags: [production, producer, asset-scout]
+context:
+  scaffold_script: setup.sh

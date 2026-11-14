@@ -32,3 +32,6 @@ One spec per feature in `Docs/Features/`.
 
 ## Out of scope (for now)
 - <multiplayer, open world, ...>
+
+## Open questions
+Questions the design doesn't answer yet. Remove each one when it is decided.

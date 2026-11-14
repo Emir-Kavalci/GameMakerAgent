@@ -81,16 +81,16 @@ If `CLAUDE.md` mentions GameMakerAgent and `Docs/GDD.md` exists, setup is done (
 
 Explain in two sentences what `/game-maker-agent:gma-init` does: it writes `CLAUDE.md` (what the agents need to know about this project), a design document and a task list, and offers Git files and the editor connection. Recommend saying yes to the editor connection: then the agents can look at the real project instead of guessing, and every change through it still needs the user's approval.
 
-Then ask the user to type `/game-maker-agent:gma-init` followed by one sentence about their game (use `$ARGUMENTS` in the example if they gave it), and to type `/game-maker-agent:gma-start` again when it is done. Commands that change files only start when the user types them, so you don't run it yourself.
+Then ask the user to type `/game-maker-agent:gma-init` followed by one sentence about their game (use `$ARGUMENTS` in the example if they gave it). If they already have a game design document, they type the file's path instead of the sentence (for example `/game-maker-agent:gma-init C:/Users/<name>/Documents/MyDesign.pdf`; .md, .txt or .pdf, so save a Word file as PDF first); the game-designer then brings it in without changing their file and asks about anything it is missing. Ask them to type `/game-maker-agent:gma-start` again when it is done. Commands that change files only start when the user types them, so you don't run it yourself.
 
 ## Step 4: Meet the team
 
 Read `CLAUDE.md` and `Docs/GDD.md`. Then explain, in at most ten short lines:
 - the core loop of working with the team: **game-designer** writes a spec (what to build and how to check it), **programmer** builds it, **qa** reviews it, the user tests it in the editor, **producer** keeps the task list;
-- the other teammates in one line each: level-designer, ui-ux-designer, art-director, technical-artist, audio-director, marketing;
+- the other teammates in one line each: level-designer, ui-ux-designer, art-director, technical-artist, audio-director, asset-scout, marketing;
 - that the user talks to a teammate by name, for example "Use the producer agent to plan my first milestone";
 - where the documents are: `Docs/GDD.md`, `Docs/Features/`, `Docs/Tasks.md`;
-- that agents can't make images, 3D models or sound files; they plan, write code and scripts, and review.
+- that agents can't make images, 3D models or sound files; they plan, write code and scripts, and review. The asset-scout finds ready-made free or paid assets with licenses that allow them in the game, and imports them after the user picks one.
 
 Tick step 4.
 

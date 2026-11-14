@@ -1,0 +1,5 @@
+schema_version: "1.1"
+name: gma-init-with-gdd-path
+tags: [setup, gma-init, game-designer]
+context:
+  scaffold_script: setup.sh

@@ -6,7 +6,7 @@ A team of [Claude Code](https://code.claude.com) agents for people who make game
 
 A real game studio has programmers, designers, artists, QA testers and producers. A solo developer has to be all of them. GameMakerAgent gives Claude Code one agent per game-development role, so you can hand each kind of work to a specialist.
 
-> **Status: early preview (v0.8.0).** Built for Unreal Engine 5.7 on Windows. The core feature workflow (designer, programmer, QA, producer) has been tested end to end on a real Unreal Engine 5.7 C++ project, and every agent has automated behavior tests (see [TESTING.md](TESTING.md)). Expect rough edges.
+> **Status: early preview (v0.9.0).** Built for Unreal Engine 5.7 on Windows. The core feature workflow (designer, programmer, QA, producer) has been tested end to end on a real Unreal Engine 5.7 C++ project, and every agent has automated behavior tests (see [TESTING.md](TESTING.md)). Expect rough edges.
 
 ## What's included
 
@@ -16,7 +16,7 @@ A real game studio has programmers, designers, artists, QA testers and producers
 
 | Agent | Role |
 | --- | --- |
-| `game-designer` | Shapes your idea, keeps the Game Design Document (`Docs/GDD.md`) and writes a spec with acceptance criteria for each feature. Doesn't write code. |
+| `game-designer` | Shapes your idea (or brings in the design document you already have and asks about what is missing), keeps the Game Design Document (`Docs/GDD.md`) and writes a spec with acceptance criteria for each feature. Doesn't write code. |
 | `level-designer` | Plans each level in `Docs/Levels/` with jump gaps and heights worked out from your character's real movement values, and (with your approval for each script) builds a grey-box blockout in the open editor. |
 | `ui-ux-designer` | Plans your screens and their flow in `Docs/UI.md` (menus, pause, HUD) with text wireframes, gamepad navigation and readability rules, then writes a spec the programmer can build. Doesn't write code. |
 | `programmer` | Writes and fixes Unreal Engine C++ gameplay code from the spec, explains compile errors, and follows your project's conventions. |
@@ -25,23 +25,24 @@ A real game studio has programmers, designers, artists, QA testers and producers
 
 The agent that writes code is never the one that reviews it.
 
-**Production and launch: plans art, sound and promotion**
+**Production and launch: art, sound and promotion**
 
 | Agent | Role |
 | --- | --- |
 | `art-director` | Defines the visual style (`Docs/ArtBible.md`), lists every art asset (`Docs/AssetList.md`), writes briefs and prompts for artists or image tools, and reviews your screenshots. |
 | `technical-artist` | Naming rules, folder structure, polygon and texture budgets, import and material setup, Content folder audits, and Unreal Editor Python / Blender scripts. |
 | `audio-director` | Plans sound effects and music (`Docs/AudioList.md`), writes briefs and prompts for audio, and explains how to set sounds up in Unreal. |
+| `asset-scout` | Finds ready-made models, animations, textures, sounds and music for your asset lists on free and paid sites (Fab, Sketchfab, Poly Haven, Kenney, Quaternius, Mixamo, Freesound and more), explains each license in plain words, and with your approval downloads and imports the one you pick. Records every asset and its credit line in `Docs/AssetCredits.md`. You buy and sign in yourself. |
 | `marketing` | Store page text, trailer shot list, devlogs, press kit and launch plan in `Docs/Marketing/`. Only claims what is really in your game, and never publishes anything itself. |
 
-**What these agents can't do:** Claude doesn't create images, 3D models, music or sound files. These agents plan, describe, write briefs and prompts for the people or tools you choose, write scripts, and review results.
+**What these agents can't do:** Claude doesn't create images, 3D models, music or sound files. These agents plan, describe, write briefs and prompts for the people or tools you choose, find ready-made assets you are allowed to use, write scripts, and review results.
 
 ### Skills (slash commands)
 
 | Command | What it does |
 | --- | --- |
 | `/game-maker-agent:gma-start` | New to all this? A step-by-step guide: checks your computer (Unreal Engine, Visual Studio C++, Git), helps you create an Unreal project, guides you through setup, introduces the team and walks you through a first small feature. It remembers where you stopped (`Docs/GettingStarted.md`), so run it again to continue. |
-| `/game-maker-agent:gma-init` | Run once inside your Unreal project. Creates `CLAUDE.md`, `Docs/GDD.md`, `Docs/Tasks.md`, and (if you agree) Unreal-ready `.gitignore` and `.gitattributes` files and the Unreal Editor connection. |
+| `/game-maker-agent:gma-init` | Run once inside your Unreal project. Creates `CLAUDE.md`, `Docs/GDD.md` (from scratch, or from a design document you already have), `Docs/Tasks.md`, and (if you agree) Unreal-ready `.gitignore` and `.gitattributes` files and the Unreal Editor connection. |
 | `/game-maker-agent:new-feature <idea>` | Takes one feature from idea to reviewed code: spec → code → build (Claude runs it while you keep the editor closed) → QA review → your editor test → task list update. You approve every step. |
 
 ### Unreal Editor connection (optional, Windows)
@@ -63,7 +64,7 @@ Event OnCollected [event declared in C++] (Collector: Actor)
 
 The connection reads Blueprint graphs but doesn't add or rewire nodes; for a Blueprint logic change the agent moves the logic to C++ (if you agree) or tells you which nodes to change.
 
-**Agents see what happened when you played.** After you test in the editor, `unreal_read_log` reads the Output Log since the last Play: errors such as "Accessed None", Blueprint errors and your own log lines, with repeats folded and engine network noise hidden. It reads the log file, so it also works after the editor has closed or crashed. `unreal_take_screenshot` gives the agent a picture of the level (or of the game view, with its UI, while you play), so `programmer`, `qa`, `technical-artist`, `art-director`, `level-designer` and `ui-ux-designer` can check how a change looks. It can look at one actor, and your own camera never moves. The editor only has to be open: it can stay behind other windows. The picture goes to the agent and is deleted right away; nothing is saved in your project.
+**Agents see what happened when you played.** After you test in the editor, `unreal_read_log` reads the Output Log since the last Play: errors such as "Accessed None", Blueprint errors and your own log lines, with repeats folded and engine network noise hidden. It reads the log file, so it also works after the editor has closed or crashed. `unreal_take_screenshot` gives the agent a picture of the level (or of the game view, with its UI, while you play), so `programmer`, `qa`, `technical-artist`, `art-director`, `level-designer`, `ui-ux-designer` and `asset-scout` can check how a change looks. It can look at one actor, and your own camera never moves. The editor only has to be open: it can stay behind other windows. The picture goes to the agent and is deleted right away; nothing is saved in your project.
 
 - **Turn it on:** run `/game-maker-agent:gma-init` and say yes to the editor connection. It enables Unreal's built-in Python Editor Script Plugin and its "Enable Remote Execution" setting. Or do it yourself: Edit > Plugins > "Python Editor Script Plugin", then Edit > Project Settings > Plugins > Python > "Enable Remote Execution?".
 - **Check it:** with the editor open, ask Claude *"Is the Unreal Editor connected?"*.
@@ -78,6 +79,7 @@ Inside an Unreal project (a folder with a `.uproject` file), the plugin checks e
 - It blocks text edits to `.uasset` and `.umap` files. These are binary, and editing them as text breaks them. Claude describes the editor steps instead.
 - It blocks changes to files inside the Unreal Engine installation folder.
 - It always asks you before a command that deletes or discards files (`rm`, `del`, `Remove-Item`, `git clean`, `git reset --hard` and similar), even if you have allowed Claude to run commands without asking.
+- It always asks you before a command that downloads from the internet (`curl`, `wget`, `Invoke-WebRequest` and similar), for example when the asset-scout downloads an asset.
 - It always asks you before a Python script runs inside the Unreal Editor.
 
 In other folders only the editor-script rule applies. On Windows it needs Git Bash, which comes with [Git for Windows](https://git-scm.com/downloads/win). Without it the guard can't run, and Claude Code shows a hook error instead.

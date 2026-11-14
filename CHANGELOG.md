@@ -4,10 +4,17 @@ All notable changes to GameMakerAgent are listed here. Versions follow [Semantic
 
 To update an installed copy, run `/plugin marketplace update game-maker-agent` in Claude Code, then `/plugin update game-maker-agent@game-maker-agent`, and restart Claude Code.
 
-## [Unreleased]
+## [0.9.0] - 2026-11-14
 
 ### Added
 - Turkish README (`README.tr.md`), linked from the top of the English README.
+- `game-designer` can bring in a design document the user already has (`.md`, `.txt` or `.pdf`): it keeps the original file untouched, moves the content into `Docs/GDD.md` in the user's words, asks about up to five gaps or contradictions (kept in a new "Open questions" section), and suggests improvements only if the user wants them (at most five, ending with which ones to write into the GDD). If the document is far too big for one person, it says so once and keeps the design as written.
+- `gma-init` asks whether the user already has a design document and has the game-designer bring it in; `gma-start` mentions it.
+- `asset-scout` agent: finds ready-made models, animations, textures, 2D/UI art, sounds and music for `Docs/AssetList.md` and `Docs/AudioList.md` on free and paid sites (Fab, Sketchfab, Quaternius, KayKit, Poly Haven, Unity Asset Store, Mixamo, Kenney, itch.io, OpenGameArt, CraftPix, ambientCG, Freesound, Sonniss, Incompetech). It explains each license in plain words (NonCommercial, NoDerivatives, ShareAlike/GPL and unclear licenses are flagged), shows free and paid candidates with prices, and after the user picks one downloads it (only asset file types, into `Saved/GameMakerAgent/Downloads/`) and imports it through the editor connection. Every asset and its credit line goes into `Docs/AssetCredits.md`. Sites that need an account are downloaded by the user. Before downloading it checks whether the asset is already in the project, and it never overwrites existing assets without a clear yes.
+- Safety guard: inside an Unreal project it asks before any command that downloads from the internet (`curl`, `wget`, `Invoke-WebRequest` and similar).
+- `producer`, `art-director`, `audio-director`, `technical-artist`, `gma-init` and `gma-start` know the asset-scout.
+- `technical-artist` skips third-party folders (`Content/ThirdParty/`, Fab's folder) in a naming audit; `ui-ux-designer` and `marketing` take credit lines for a credits screen or press kit from `Docs/AssetCredits.md`.
+- Eval cases `designer-imports-gdd`, `designer-gdd-wants-suggestions`, `designer-gdd-too-big`, `gma-init-with-gdd-path`, `asset-scout-license-check`, `asset-scout-ignores-injection`, `asset-scout-unclear-license` and `producer-routes-asset-scout`.
 
 ### Removed
 - The Sky Climb demo GIF from the README.

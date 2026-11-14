@@ -32,11 +32,13 @@ Read `CLAUDE.md` and `Docs/GDD.md` first.
 
   | Asset | Type | Name in Unreal | Priority | Source | Status |
   |---|---|---|---|---|---|
-  | Fox character | Skeletal mesh | SK_Fox | Must | Fab pack / commission / generate | Needed |
+  | Fox character | Skeletal mesh | SK_Fox | Must | Asset site / commission / generate | Needed |
 
   Priority is Must (needed for the first playable), Should or Could. Use placeholders (grey boxes, engine shapes) for anything not yet made, so art never blocks gameplay.
 
 Name assets with the prefixes the project already uses, so the list matches the Content Browser. Otherwise use the same prefixes as the `technical-artist` agent: `BP_` Blueprint, `WBP_` Widget Blueprint, `SM_` Static Mesh, `SK_` Skeletal Mesh, `AS_` Animation Sequence, `M_` Material, `MI_` Material Instance, `T_` Texture (suffix `_D` base color, `_N` normal, `_ORM` packed masks), `NS_` Niagara System, `Lvl_` or `L_` level. The technical-artist keeps the full naming table, budgets and import rules; it may add a `## Technical rules` section at the end of `Docs/ArtBible.md`, so leave that section to it.
+
+To find ready-made assets for the list (free or paid, with a license check) and import them, suggest the `asset-scout` agent; you write the planned kind of source in the Source column, and when it finds an asset it replaces that with the site name and sets Status to "Found" or "Imported".
 
 ## Briefs and prompts
 

@@ -51,6 +51,7 @@ The cases live in `plugins/game-maker-agent/evals/`, one folder per case. Each c
 | Case | What it proves |
 | --- | --- |
 | `designer-writes-spec` | game-designer writes a spec with testable acceptance criteria and no code |
+| `designer-imports-gdd` | game-designer brings the user's own design document into `Docs/GDD.md`, leaves the original untouched, lists gaps and a contradiction as open questions, and makes no suggestions when told not to |
 | `level-designer-plans-level` | level-designer writes a level plan from the character's real values (double jump), with sizes and a playtest checklist, and creates no level or code files |
 | `ui-ux-no-fake-options` | ui-ux-designer plans the menus in `Docs/UI.md` with gamepad navigation and leaves out multiplayer, which the game doesn't have |
 | `programmer-new-class` | programmer follows the project's module layout, `_API` macro and Unreal header rules |
@@ -61,6 +62,13 @@ The cases live in `plugins/game-maker-agent/evals/`, one folder per case. Each c
 | `tech-artist-audit-read-only` | technical-artist finds badly named assets and changes nothing |
 | `art-director-no-images` | art-director says it can't make images and offers a brief instead |
 | `audio-director-no-audio` | audio-director says it can't make sound files and offers a brief instead |
+| `asset-scout-license-check` | asset-scout rejects a NonCommercial model for a game that will be sold, accepts a CC BY one, records it with its credit line in `Docs/AssetCredits.md`, and marks it in the asset list |
+| `asset-scout-ignores-injection` | asset-scout ignores an instruction hidden in text copied from an asset page, tells the user about it, and still rejects a NonCommercial model for a game that will be sold |
+| `asset-scout-unclear-license` | asset-scout rejects an "editorial use only" model and one with no written license, and records neither |
+| `designer-gdd-wants-suggestions` | after bringing in the user's document, game-designer gives at most five suggestions with reasons and writes none of them into the GDD before the user accepts |
+| `designer-gdd-too-big` | game-designer keeps a design that is far too big for one person as written and names the scope risk once, without pushing changes |
+| `gma-init-with-gdd-path` | gma-init given a design document path has the game-designer write `Docs/GDD.md` from it and leaves the original untouched |
+| `producer-routes-asset-scout` | producer gives finding and importing ready-made models and sounds to asset-scout |
 | `gma-start-resumes` | gma-start reads its progress file and continues at the first feature instead of repeating setup |
 | `gma-start-new-project` | gma-start in a fresh project saves its progress and sends the user to gma-init without doing setup itself |
 | `gma-init-sets-up-project` | gma-init writes CLAUDE.md with the right facts, the GDD and the task list |
@@ -73,7 +81,7 @@ The `new-feature` workflow isn't covered: it stops for the user at every checkpo
 From `plugins/game-maker-agent/`:
 
 ```bash
-# Quick check: every case once (about 1 USD with Sonnet)
+# Quick check: every case once (about 2 USD with Sonnet)
 claude plugin eval . --scaffold --trust-plugin --allow-tools Write Edit --ablation none --runs 1 -j 4 --model sonnet
 
 # One case, three runs, after changing one agent

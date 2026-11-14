@@ -31,7 +31,10 @@ Templates for this skill are in `${CLAUDE_SKILL_DIR}/templates/`.
    - Whether a `Source/` folder exists (C++ project) or not (Blueprint-only project).
    If `Source/<ProjectName>/` exists, note the folder layout and the `<PROJECTNAME>_API` macro.
 
-3. **Ask about the game** if `$ARGUMENTS` is empty: one short question, "In one or two sentences, what game are you making?". Accept "I don't know yet" and leave placeholders.
+3. **Ask about the game.**
+   - If `$ARGUMENTS` is empty, ask in one message: "In one or two sentences, what game are you making? Or, if you already have a game design document, tell me where the file is (.md, .txt or .pdf)." Accept "I don't know yet" and leave placeholders.
+   - If `$ARGUMENTS` names a design document (a file path, or words like "my GDD is in ..."), use that document (step 5) and take the one-sentence description from it.
+   - Otherwise `$ARGUMENTS` is the description: don't stop to ask more. Step 8 tells the user how to bring in a document later.
 
 4. **Write `CLAUDE.md`** in the project root, filled in from the facts above:
 
@@ -56,6 +59,7 @@ Templates for this skill are in `${CLAUDE_SKILL_DIR}/templates/`.
    - qa reviews the change against the spec's acceptance criteria.
    - producer keeps Docs/Tasks.md up to date.
    - art-director (Docs/ArtBible.md, Docs/AssetList.md), technical-artist (naming, budgets, materials), audio-director (Docs/AudioList.md) and marketing (Docs/Marketing/) plan art, sound and promotion.
+   - asset-scout finds ready-made models, textures and sounds that fit the lists, checks their licenses, imports them after approval and records them in Docs/AssetCredits.md.
 
    ## Conventions
    - Follow Unreal Engine naming conventions (A/U/F/E/I prefixes, b for booleans).
@@ -76,6 +80,7 @@ Templates for this skill are in `${CLAUDE_SKILL_DIR}/templates/`.
 
 5. **Create the design documents** from the templates:
    - `Docs/GDD.md` from `templates/GDD.md`. Replace `<Game title>` with the project name, and fill in the pitch from the user's description if there is one.
+     If the user has a design document of their own, don't fill the template yourself. Ask the `game-maker-agent:game-designer` agent (Agent tool) to bring it into `Docs/GDD.md`, giving it the document's path (or the pasted text) and the project name. It keeps the original file untouched and returns the open questions it found. Ask the user those questions, and send the answers back to the game-designer to write into the GDD. Repeat until it has no open questions (at most three rounds; whatever is still open stays in the GDD), then pass on its question about improvement suggestions in the same way. If the user wants to answer later, continue setup; the questions stay in the GDD's "Open questions" section.
    - `Docs/Tasks.md` from `templates/Tasks.md`.
    - An empty `Docs/Features/` folder (create a `Docs/Features/README.md` with one line: "One spec per feature, written by the game-designer agent (by the ui-ux-designer agent for screens).").
 
@@ -100,4 +105,5 @@ Templates for this skill are in `${CLAUDE_SKILL_DIR}/templates/`.
    - "Use the game-designer agent to design a sprint ability."
    - "/game-maker-agent:new-feature sprint ability"
    - "Use the producer agent to plan my first playable milestone."
+   Unless a design document was brought in, add one line: if they already have a game design document, they can say "Use the game-designer agent to bring in my design document <path>".
    If `Docs/GettingStarted.md` exists, the user came from the getting-started guide: instead of the three examples, tell them to type `/game-maker-agent:gma-start` to continue it.

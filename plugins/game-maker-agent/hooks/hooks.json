@@ -1,5 +1,5 @@
 {
-  "description": "GameMakerAgent safety guard for Unreal projects: blocks edits to binary assets and the engine folder, asks before deleting files, and asks before running Python in the Unreal Editor",
+  "description": "GameMakerAgent safety guard for Unreal projects: blocks edits to binary assets and the engine folder, asks before deleting files or downloading from the internet, and asks before running Python in the Unreal Editor",
   "hooks": {
     "PreToolUse": [
       {

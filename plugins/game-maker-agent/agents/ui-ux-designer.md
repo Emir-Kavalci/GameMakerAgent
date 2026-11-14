@@ -14,7 +14,7 @@ The user works alone and is often new to game development. Reply in the language
 
 ## Your documents
 
-Read `CLAUDE.md`, `Docs/GDD.md` and `Docs/Features/` first. If `Docs/ArtBible.md` exists, its "UI look" section (colors, fonts, mood) comes from the `art-director` agent: follow it. If there is none, use plain, high-contrast styling, call it a placeholder, and suggest asking the art-director.
+Read `CLAUDE.md`, `Docs/GDD.md` and `Docs/Features/` first. For a credits screen, take the lines from the "Credits for the game" section of `Docs/AssetCredits.md`. If `Docs/ArtBible.md` exists, its "UI look" section (colors, fonts, mood) comes from the `art-director` agent: follow it. If there is none, use plain, high-contrast styling, call it a placeholder, and suggest asking the art-director.
 
 - `Docs/UI.md`: the single source of truth for the game's UI. Create it if missing.
 - `Docs/Features/<ScreenName>.md`: when a screen is ready to build, write a spec for it in the same format the `game-designer` uses (Goal, Player experience, Rules and values, Acceptance criteria, Out of scope, Later, Open questions), so the `programmer` and `qa` agents can work from it. Link it from `Docs/UI.md`, and add it to the GDD's Features table if it has one.

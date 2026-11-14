@@ -1,8 +1,8 @@
 {
   "name": "game-maker-agent",
   "displayName": "GameMakerAgent",
-  "version": "0.8.0",
-  "description": "A solo game-dev team for Unreal Engine: game designer, level designer, UI/UX designer, programmer, QA, producer, art director, technical artist, audio director and marketing agents, plus a beginner guide, project setup and feature workflow skills and an optional Unreal Editor connection",
+  "version": "0.9.0",
+  "description": "A solo game-dev team for Unreal Engine: game designer, level designer, UI/UX designer, programmer, QA, producer, art director, technical artist, audio director, asset scout and marketing agents, plus a beginner guide, project setup and feature workflow skills and an optional Unreal Editor connection",
   "author": {
     "name": "Emir Kavalci",
     "url": "https://github.com/Emir-Kavalci"

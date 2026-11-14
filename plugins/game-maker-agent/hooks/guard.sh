@@ -6,6 +6,7 @@
 # - denies Write/Edit on .uasset/.umap files (binary assets; use the editor)
 # - denies Write/Edit inside an Unreal Engine installation
 # - asks the user before shell commands that delete or discard files
+# - asks the user before shell commands that download from the internet
 # Reads the hook input JSON on stdin. Uses only grep, so it needs no jq.
 
 input=$(tr -d '\r\n')
@@ -54,6 +55,9 @@ case "$tool" in
     cmd=$(field command)
     if printf '%s' "$cmd" | grep -qiE '(^|[^A-Za-z0-9_-])(rm|rmdir|rd|del|erase|Remove-Item|ri)([[:space:]]|$)|git[[:space:]]+(clean|reset[[:space:]]+--hard|checkout[[:space:]]+--|restore)([[:space:]]|$)'; then
       decide ask "GameMakerAgent: this command deletes or discards files in your Unreal project. Check what it removes before you allow it."
+    fi
+    if printf '%s' "$cmd" | grep -qiE '(^|[^A-Za-z0-9_-])(curl|wget|Invoke-WebRequest|iwr|Invoke-RestMethod|irm|Start-BitsTransfer|bitsadmin)(\.exe)?([[:space:]]|$)'; then
+      decide ask "GameMakerAgent: this command downloads from the internet into your Unreal project. Check the link and what it saves before you allow it."
     fi
     ;;
 esac
