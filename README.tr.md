@@ -8,10 +8,6 @@ Gerçek bir oyun stüdyosunda programcılar, tasarımcılar, sanatçılar, test 
 
 > **Durum: erken önizleme (v0.8.0).** Windows üzerinde Unreal Engine 5.7 için yapıldı. Temel özellik akışı (tasarımcı, programcı, QA, yapımcı) gerçek bir Unreal Engine 5.7 C++ projesinde baştan sona denendi ve her agent'ın otomatik davranış testleri var (bkz. [TESTING.md](TESTING.md), İngilizce). Pürüzler olabilir.
 
-![Sky Climb: yükselen lavdan kaçarak gri kutulardan yapılmış bir kuleye yandan görünümle tırmanış, sonunda "YOU MADE IT!" yazısı](docs/images/sky-climb-demo.gif)
-
-*Sky Climb: bu agent'larla, sıfırdan açılmış bir Unreal Engine 5.7 C++ Third Person projesinde yapılmış küçük bir oyun. Oyun tasarımcısı fikri geliştiriciyle birlikte seçti ve beş özellik spec'i yazdı; programcı C++ kodunu yazdı ve kuleyi editör bağlantısı üzerinden kurdu; QA her adımı inceledi; yapımcı görev listesini tuttu; sanat yönetmeni ve teknik sanatçı görsel düzenlemeyi yaptı. Sadece gri kutular; yeni bir sanat varlığı yok.*
-
 ## Neler var
 
 ### Agent'lar

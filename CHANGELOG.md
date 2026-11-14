@@ -9,6 +9,9 @@ To update an installed copy, run `/plugin marketplace update game-maker-agent` i
 ### Added
 - Turkish README (`README.tr.md`), linked from the top of the English README.
 
+### Removed
+- The Sky Climb demo GIF from the README.
+
 ## [0.8.0] - 2026-11-14
 
 ### Added
